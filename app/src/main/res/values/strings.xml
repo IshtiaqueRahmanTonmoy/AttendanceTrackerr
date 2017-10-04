@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AttendanceTrackerr</string>
+
+    <string name="in">In Time</string>
+    <string name="out">Out Time</string>
+    <string name="remarks">Remarks</string>
+    <string name="submit">Submit</string>
+
+</resources>
