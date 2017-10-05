@@ -1,5 +1,9 @@
 package com.ingeniousat.com.attendancetrackerr;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -16,6 +22,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,27 +41,55 @@ public class AttendanceActivity extends AppCompatActivity {
     DateFormat dateFormat;
     Calendar cal,cal1;
     SimpleDateFormat sdf,sdf1;
-    String employee_id="00025";
+    String employee_id;
     String remarksEdt,date;
+    boolean value;
+    String email;
+    String urlvalue = "http://192.168.1.122/AttendancePhp/getvalue.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
 
+        inTime = (CheckBox) findViewById(R.id.checkBox1);
+        outTime = (CheckBox) findViewById(R.id.checkBox2);
+
+
+        Intent intent = getIntent();
+        email = intent.getExtras().getString("email");
+
+
+        //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String name = preferences.getString("val", "");
+        if(!name.equalsIgnoreCase(""))
+        {
+            inTime.setEnabled(false);
+        }
+
+        //Toast.makeText(AttendanceActivity.this, ""+val, Toast.LENGTH_SHORT).show();
+
         dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         datetime = new Date();
         //System.out.println(dateFormat.format(date));
 
-        inTime = (CheckBox) findViewById(R.id.checkBox1);
-        outTime = (CheckBox) findViewById(R.id.checkBox2);
 
         outTime.setChecked(false);
 
         remarks = (EditText) findViewById(R.id.remarksEdt);
     }
 
+
     public void OnSubmit(View view) {
+
+        getValue(email);
+        SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edt = pref.edit();
+        edt.putBoolean("activity_executed", true);
+        edt.commit();
+
         if (inTime.isChecked()) {
 
             cal = Calendar.getInstance();
@@ -72,6 +110,8 @@ public class AttendanceActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             Log.d("response", response);
+                            inTime.setChecked(false);
+                            inTime.setEnabled(false);
                             // Display the response string.
                             //_response.setText(response);
                         }
@@ -97,7 +137,7 @@ public class AttendanceActivity extends AppCompatActivity {
             queue.add(stringRequest);
         }
 
-        if (outTime.isChecked()) {
+        if (outTime.isChecked() && !inTime.isEnabled()) {
 
             cal1 = Calendar.getInstance();
             sdf1 = new SimpleDateFormat("hh:mm:ss a");
@@ -138,4 +178,41 @@ public class AttendanceActivity extends AppCompatActivity {
 
         }
     }
+
+    private void getValue(final String email) {
+        RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
+//for POST requests, only the following line should be changed to
+
+        StringRequest sr = new StringRequest(Request.Method.GET, urlvalue,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.e("HttpClient", "success! response: " + response.toString());
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            employee_id = json.getString("employee_id");
+                            Toast.makeText(AttendanceActivity.this, ""+employee_id, Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("HttpClient", "error: " + error.toString());
+                    }
+                })
+        {
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("email",email);
+                return params;
+            }
+
+        };
+        queue.add(sr);
+    }
+
 }

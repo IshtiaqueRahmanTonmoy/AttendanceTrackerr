@@ -9,6 +9,25 @@
     android:orientation="vertical">
 
     <EditText
+        android:id="@+id/name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="@drawable/edit_text_design"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:maxLength="50"
+        android:hint="@string/name"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dip"
+        android:paddingTop="15dp"
+        android:textSize="18sp"/>
+
+    <EditText
         android:id="@+id/email"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -18,13 +37,30 @@
         android:inputType="text"
         android:maxLength="50"
         android:hint="@string/email"
-        android:drawableRight="@drawable/remove"
-        android:layout_marginTop="15dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
-        android:paddingRight="15dip"
+        android:paddingRight="45dip"
+        android:paddingTop="15dp"
+        android:textSize="18sp"/>
+    <EditText
+        android:id="@+id/desingnation"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="@drawable/edit_text_design"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:maxLength="50"
+        android:hint="@string/designation"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="15dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="45dip"
         android:paddingTop="15dp"
         android:textSize="18sp"/>
 
@@ -46,7 +82,6 @@
         android:paddingRight="45dip"
         android:paddingTop="15dp"
         android:textSize="18sp"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -54,7 +89,7 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/login_button"
+            android:id="@+id/submit"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="10dp"

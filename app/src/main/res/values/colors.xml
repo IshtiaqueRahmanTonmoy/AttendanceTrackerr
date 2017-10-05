@@ -6,4 +6,5 @@
     <color name="ColorShade">#d7dcdc</color>
     <color name="ColorPrimary">#22bdff</color>
     <color name="textColorPrimary">#FFFFFF</color>
+    <color name="black">#101010</color>
 </resources>

@@ -6,4 +6,11 @@
     <string name="remarks">Remarks</string>
     <string name="submit">Submit</string>
 
+    <string name="name">Name</string>
+    <string name="designation">Designation</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="signin">Sign In</string>
+    <string name="forgot">Forgot Password</string>
+
 </resources>
