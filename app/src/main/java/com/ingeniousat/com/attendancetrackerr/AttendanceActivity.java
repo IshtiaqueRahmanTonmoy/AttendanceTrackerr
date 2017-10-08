@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import android.view.View;
@@ -20,9 +23,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +51,7 @@ public class AttendanceActivity extends AppCompatActivity {
     String remarksEdt,date;
     boolean value;
     String email;
-    String urlvalue = "http://192.168.1.122/AttendancePhp/getvalue.php";
+    String urlvalue = "http://192.168.0.103/AttendancePhp/getvalue.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +93,7 @@ public class AttendanceActivity extends AppCompatActivity {
         getValue(email);
         SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         SharedPreferences.Editor edt = pref.edit();
+        edt.putString("email",email);
         edt.putBoolean("activity_executed", true);
         edt.commit();
 
@@ -102,7 +109,7 @@ public class AttendanceActivity extends AppCompatActivity {
             //this is the url where you want to send the request
             //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 
-            String url = "http://192.168.1.122/AttendancePhp/insert.php";
+            String url = "http://192.168.0.103/AttendancePhp/insert.php";
 
             // Request a string response from the provided URL.
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -146,7 +153,7 @@ public class AttendanceActivity extends AppCompatActivity {
             //this is the url where you want to send the request
             //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 
-            String url = "http://192.168.1.122/AttendancePhp/update.php";
+            String url = "http://192.168.0.103/AttendancePhp/update.php";
 
             // Request a string response from the provided URL.
             StringRequest stringRequests = new StringRequest(Request.Method.POST, url,
@@ -180,39 +187,34 @@ public class AttendanceActivity extends AppCompatActivity {
     }
 
     private void getValue(final String email) {
-        RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
-//for POST requests, only the following line should be changed to
 
-        StringRequest sr = new StringRequest(Request.Method.GET, urlvalue,
-                new Response.Listener<String>() {
+        RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
+        String uri = String.format("http://192.168.0.103/AttendancePhp/getvalue.php?email="+email);
+        StringRequest stringRequests = new StringRequest(Request.Method.GET, uri,new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("HttpClient", "success! response: " + response.toString());
                         try {
-                            JSONObject json = new JSONObject(response);
-                            employee_id = json.getString("employee_id");
-                            Toast.makeText(AttendanceActivity.this, ""+employee_id, Toast.LENGTH_SHORT).show();
+                            JSONObject rsp = new JSONObject(response);
+                            JSONArray array = rsp.getJSONArray("result");
+                            for (int i = 0; i < array.length(); i++) {
+                                JSONObject users = array.getJSONObject(i);
+                                employee_id = users.getString("employee_id");
+                                //Toast.makeText(AttendanceActivity.this, ""+emplo, Toast.LENGTH_SHORT).show();
+                            }
+                            // do your work with response object
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("HttpClient", "error: " + error.toString());
-                    }
-                })
-        {
+                }, new Response.ErrorListener() {
             @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("email",email);
-                return params;
+            public void onErrorResponse(VolleyError error) {
+                //_response.setText("That didn't work!");
             }
+        });
+        // Add the request to the RequestQueue.
+        queues.add(stringRequests);
 
-        };
-        queue.add(sr);
     }
-
 }

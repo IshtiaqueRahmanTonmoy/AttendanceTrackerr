@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText emailEdt,passwordEdt;
     Button submitBtn;
-    String url = "http://192.168.1.122/AttendancePhp/login.php";
+    String url = "http://192.168.0.103/AttendancePhp/login.php";
     String email,password;
     TextView signupText;
 
@@ -52,12 +52,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+
+        String emailvalue = pref.getString("email","defaul_value");
         if (pref.getBoolean("activity_executed", false)) {
             Intent intent = new Intent(this, AttendanceActivity.class);
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("val","1");
+            editor.putString("email",emailvalue);
             editor.apply();
 
             startActivity(intent);
@@ -73,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 email = emailEdt.getText().toString();
                 password = passwordEdt.getText().toString();
 
+                Intent intent = new Intent(MainActivity.this, AttendanceActivity.class);
+                intent.putExtra("email",email);
+                startActivity(intent);
+                /*
                 RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
                 //this is the url where you want to send the request
                 //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
@@ -108,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 };
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
+                */
             }
         });
             }
