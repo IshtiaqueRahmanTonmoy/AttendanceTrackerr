@@ -51,7 +51,7 @@ public class AttendanceActivity extends AppCompatActivity {
     String remarksEdt,date;
     boolean value;
     String email;
-    String urlvalue = "http://192.168.0.103/AttendancePhp/getvalue.php";
+    String urlvalue = "http://ingtechbd.com/demo/attendance/getvalue.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
         //Toast.makeText(AttendanceActivity.this, ""+val, Toast.LENGTH_SHORT).show();
 
-        dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         datetime = new Date();
         //System.out.println(dateFormat.format(date));
 
@@ -101,7 +101,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
             cal = Calendar.getInstance();
             sdf = new SimpleDateFormat("hh:mm:ss a");
-
+            String t =
             remarksEdt = remarks.getText().toString();
             date = dateFormat.format(datetime);
 
@@ -109,7 +109,7 @@ public class AttendanceActivity extends AppCompatActivity {
             //this is the url where you want to send the request
             //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 
-            String url = "http://192.168.0.103/AttendancePhp/insert.php";
+            String url = "http://ingtechbd.com/demo/attendance/insert.php";
 
             // Request a string response from the provided URL.
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -153,7 +153,7 @@ public class AttendanceActivity extends AppCompatActivity {
             //this is the url where you want to send the request
             //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 
-            String url = "http://192.168.0.103/AttendancePhp/update.php";
+            String url = "http://ingtechbd.com/demo/attendance/update.php";
 
             // Request a string response from the provided URL.
             StringRequest stringRequests = new StringRequest(Request.Method.POST, url,
@@ -189,7 +189,7 @@ public class AttendanceActivity extends AppCompatActivity {
     private void getValue(final String email) {
 
         RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
-        String uri = String.format("http://192.168.0.103/AttendancePhp/getvalue.php?email="+email);
+        String uri = String.format("http://ingtechbd.com/demo/attendance/getvalue.php?email="+email);
         StringRequest stringRequests = new StringRequest(Request.Method.GET, uri,new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

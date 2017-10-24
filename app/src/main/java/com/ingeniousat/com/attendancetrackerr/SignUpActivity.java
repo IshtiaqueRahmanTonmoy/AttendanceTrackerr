@@ -27,7 +27,7 @@ public class SignUpActivity extends AppCompatActivity {
     int i=0;
     int employee_id;
     String name,email,designation,password;
-    String url = "http://192.168.1.122/AttendancePhp/register.php";
+    String url = "http://ingtechbd.com/demo/attendance/register.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
