@@ -50,7 +50,7 @@ public class AttendanceActivity extends AppCompatActivity {
     String employee_id;
     String remarksEdt,date;
     boolean value;
-    String email;
+    String employeeid;
     String urlvalue = "http://ingtechbd.com/demo/attendance/getvalue.php";
 
     @Override
@@ -63,8 +63,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        email = intent.getExtras().getString("email");
-
+        employee_id = intent.getExtras().getString("employeeid");
 
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 
@@ -90,10 +89,10 @@ public class AttendanceActivity extends AppCompatActivity {
 
     public void OnSubmit(View view) {
 
-        getValue(email);
+        //getValue(email);
         SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         SharedPreferences.Editor edt = pref.edit();
-        edt.putString("email",email);
+        edt.putString("email",employee_id);
         edt.putBoolean("activity_executed", true);
         edt.commit();
 
@@ -117,6 +116,7 @@ public class AttendanceActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             Log.d("response", response);
+                            Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
                             inTime.setChecked(false);
                             inTime.setEnabled(false);
                             // Display the response string.
@@ -161,6 +161,7 @@ public class AttendanceActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             Log.d("response", response);
+                            Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
                             // Display the response string.
                             //_response.setText(response);
                         }

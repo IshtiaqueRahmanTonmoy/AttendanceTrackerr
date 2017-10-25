@@ -7,4 +7,7 @@
     <color name="ColorPrimary">#22bdff</color>
     <color name="textColorPrimary">#FFFFFF</color>
     <color name="black">#101010</color>
+
+    <color name="green">#56bc41</color>
+    <color name="red">#de2525</color>
 </resources>

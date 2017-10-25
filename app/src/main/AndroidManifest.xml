@@ -22,7 +22,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".AttendanceActivity"></activity>
+        <activity android:name=".AttendanceActivity" />
+        <activity android:name=".AdminActivity" />
+        <activity android:name=".HistoryActivity"></activity>
     </application>
 
 </manifest>

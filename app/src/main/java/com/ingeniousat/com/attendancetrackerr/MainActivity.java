@@ -29,10 +29,10 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText emailEdt,passwordEdt;
+    EditText empidEdt,passwordEdt;
     Button submitBtn;
     String url = "http://ingtechbd.com/demo/attendance/login.php";
-    String email,password;
+    String employee_id,password;
     TextView signupText;
 
     @Override
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        emailEdt = (EditText) findViewById(R.id.email);
+        empidEdt = (EditText) findViewById(R.id.employeeid);
         passwordEdt = (EditText) findViewById(R.id.password);
         signupText = (TextView) findViewById(R.id.creteaccount);
         signupText.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                email = emailEdt.getText().toString();
+                employee_id = empidEdt.getText().toString();
                 password = passwordEdt.getText().toString();
 
                 /*
@@ -94,9 +94,19 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, "Please enter correct information..", Toast.LENGTH_SHORT).show();
                                 }
                                 else {
-                                    Intent intent = new Intent(MainActivity.this,AttendanceActivity.class);
-                                    intent.putExtra("email",email);
-                                    startActivity(intent);
+
+                                    if(employee_id.equals("238")){
+                                        Intent intent = new Intent(MainActivity.this,AdminActivity.class);
+                                        startActivity(intent);
+                                    }
+
+                                    else{
+                                        Intent intent = new Intent(MainActivity.this,AttendanceActivity.class);
+                                        intent.putExtra("employeeid",employee_id);
+                                        startActivity(intent);
+                                    }
+
+
                                 }
                                 // Display the response string.
                                 //_response.setText(response);
@@ -113,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> params = new HashMap<>();
 
-                        params.put("email", email);
+                        params.put("email", employee_id);
                         params.put("password",password);
 
                         return params;

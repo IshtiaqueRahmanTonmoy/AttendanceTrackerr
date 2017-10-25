@@ -9,15 +9,15 @@
     android:orientation="vertical">
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/employeeid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:background="@drawable/edit_text_design"
         android:imeOptions="actionDone"
-        android:inputType="text"
+        android:inputType="number"
         android:maxLength="50"
-        android:hint="@string/email"
+        android:hint="@string/employeeid"
         android:drawableRight="@drawable/remove"
         android:layout_marginTop="15dp"
         android:layout_marginLeft="10dp"
