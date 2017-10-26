@@ -39,6 +39,9 @@ public class HistoryActivity extends AppCompatActivity {
     private ArrayList<Employee> usersList;
     RecyclerView recyclerView;
     MyAdapter mAdapter;
+    //SharedPreferences preferences;
+    //SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,99 +55,36 @@ public class HistoryActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         searchview = (EditText) findViewById(R.id.searhText);
-        searchBtn = (Button) findViewById(R.id.buttonSearch);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
+
+        searchview.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String value = searchview.getText().toString();
-                getsearch(value);
-                getname(value);
+                if(value!=null) {
+                    getname(value);
+                    //getsearch(value);
+                }
+                if(searchview.length() == 0){
+                    usersList.clear();
+                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                    recyclerView.setAdapter(mAdapter);
+                    //preferences.edit().clear().commit();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
     }
 
-    private void getsearch(final String value) {
-        Uri.Builder builder = Uri.parse(GETINFO_URL).buildUpon();
-        builder.appendQueryParameter("employee_id", value);
-        String loginUrl=builder.build().toString();
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray jsonarray = jsonObject.getJSONArray("result");
-                            getInfo(jsonarray,value);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("response",response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //You can handle error here if you want
-                    }
-                }){
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
-        requestQueue.add(stringRequest);
-    }
-
-        private void getInfo(JSONArray j,String value) {
-            //Toast.makeText(HistoryActivity.this, "empid"+value, Toast.LENGTH_SHORT).show();
-            for(int i=0;i<j.length();i++){
-
-                //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
-                try {
-                    //Getting json object
-                    JSONObject json = j.getJSONObject(i);
-                    in_time = json.getString("in_time");
-                    out_time = json.getString("out_time");
-                    remarks = json.getString("remarks");
-                    date = json.getString("date");
-
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                    name = preferences.getString("Name", "");
-
-                    //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
-                    usersList.add(new Employee(name,in_time,out_time,remarks,date));
-                    //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
-
-                    mAdapter = new MyAdapter(usersList, this);
-                    recyclerView.setAdapter(mAdapter);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    private void getname(JSONArray j) {
-        for(int i=0;i<j.length();i++){
-            try {
-                //Getting json object
-                JSONObject json = j.getJSONObject(i);
-                name = json.getString("name");
-
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("Name",name);
-                editor.apply();
-
-
-                //Toast.makeText(HistoryActivity.this, ""+name, Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void getname(String value) {
+    private void getname(final String value) {
         Uri.Builder builder = Uri.parse(GETNAME_URL).buildUpon();
         builder.appendQueryParameter("employee_id", value);
         String loginUrl=builder.build().toString();
@@ -155,8 +95,25 @@ public class HistoryActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            JSONArray jsonarray = jsonObject.getJSONArray("result");
-                            getname(jsonarray);
+                            JSONArray j = jsonObject.getJSONArray("result");
+                            for(int i=0;i<j.length();i++){
+                                try {
+                                    //Getting json object
+                                    JSONObject json = j.getJSONObject(i);
+                                    name = json.getString("name");
+                                    getsearch(value,name);
+                                    //Toast.makeText(HistoryActivity.this, "name is"+name, Toast.LENGTH_SHORT).show();
+                                    //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
+                                    //editor = preferences.edit();
+                                    //editor.putString("Name",name);
+                                    //editor.apply();
+
+
+                                    //Toast.makeText(HistoryActivity.this, ""+name, Toast.LENGTH_SHORT).show();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -175,6 +132,65 @@ public class HistoryActivity extends AppCompatActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
         requestQueue.add(stringRequest);
     }
-     }
+
+    private void getsearch(String value, final String name) {
+        Uri.Builder builder = Uri.parse(GETINFO_URL).buildUpon();
+        builder.appendQueryParameter("employee_id", value);
+        String loginUrl=builder.build().toString();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray j = jsonObject.getJSONArray("result");
+                            //Toast.makeText(HistoryActivity.this, "empid"+value, Toast.LENGTH_SHORT).show();
+                            for(int i=0;i<j.length();i++){
+
+                                //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
+                                try {
+                                    //Getting json object
+                                    JSONObject json = j.getJSONObject(i);
+                                    in_time = json.getString("in_time");
+                                    out_time = json.getString("out_time");
+                                    remarks = json.getString("remarks");
+                                    date = json.getString("date");
+
+                                    //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
+                                    //name = preferences.getString("Name", "");
+
+                                    //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
+                                    usersList.add(new Employee(name,in_time,out_time,remarks,date));
+                                    //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
+
+                                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                    recyclerView.setAdapter(mAdapter);
+                                    //usersList.clear();
+                                    mAdapter.notifyDataSetChanged();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("response",response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //You can handle error here if you want
+                    }
+                }){
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
+        requestQueue.add(stringRequest);
+    }
+}
 
 

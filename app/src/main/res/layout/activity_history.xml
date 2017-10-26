@@ -10,22 +10,38 @@
     tools:context="com.ingeniousat.com.attendancetrackerr.HistoryActivity"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_below="@+id/iv_divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="2dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Asad employee id - 850"
+            android:textColor="@color/colorPrimary"
+            android:gravity="center"
+            android:textSize="20sp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ishtiaque employee id - 680"
+            android:textColor="@color/colorPrimary"
+            android:gravity="center"
+            android:textSize="20sp" />
+    </LinearLayout>
+
     <EditText
         android:id="@+id/searhText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="search by date or employee id"
-        />
-    <Button
-        android:id="@+id/buttonSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="search"
+        android:text="search by mployee id.."
         />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_my_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="fill_parent" />
 
 </LinearLayout>

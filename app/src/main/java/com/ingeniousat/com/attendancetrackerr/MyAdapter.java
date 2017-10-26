@@ -21,8 +21,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     WeakReference<Context> mContextWeakReference;
     Context context;
 
-    public MyAdapter(ArrayList<Employee> employeelist, Context context) {
-        emplist = employeelist;
+    public MyAdapter(ArrayList<Employee> emplist, Context context) {
+        this.emplist = new ArrayList<>(emplist);
         this.mContextWeakReference = new WeakReference<Context>(context);
     }
 
@@ -52,6 +52,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
         Employee employee = emplist.get(position);
 
+        //Toast.makeText(context, ""+employee.getDate(), Toast.LENGTH_SHORT).show();
         holder.TvName.setText(employee.getName());
         holder.TvInTime.setText(employee.getInTime());
         holder.TvOutTime.setText(employee.getOutTime());

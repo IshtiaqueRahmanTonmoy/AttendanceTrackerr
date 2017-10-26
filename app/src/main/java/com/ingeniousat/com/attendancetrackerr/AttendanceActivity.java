@@ -3,9 +3,14 @@ package com.ingeniousat.com.attendancetrackerr;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.net.MalformedURLException;
@@ -61,6 +66,8 @@ public class AttendanceActivity extends AppCompatActivity {
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
 
+        String routername = getWifiName(AttendanceActivity.this);
+        Log.d("name",routername);
 
         Intent intent = getIntent();
         employee_id = intent.getExtras().getString("employeeid");
@@ -96,95 +103,114 @@ public class AttendanceActivity extends AppCompatActivity {
         edt.putBoolean("activity_executed", true);
         edt.commit();
 
+
+        //Toast.makeText(AttendanceActivity.this, ""+name, Toast.LENGTH_SHORT).show();
+
         if (inTime.isChecked()) {
 
-            cal = Calendar.getInstance();
-            sdf = new SimpleDateFormat("hh:mm:ss a");
-            String t =
-            remarksEdt = remarks.getText().toString();
-            date = dateFormat.format(datetime);
+                cal = Calendar.getInstance();
+                sdf = new SimpleDateFormat("hh:mm:ss a");
+                String t =
+                        remarksEdt = remarks.getText().toString();
+                date = dateFormat.format(datetime);
 
-            RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
-            //this is the url where you want to send the request
-            //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
+                RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
+                //this is the url where you want to send the request
+                //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 
-            String url = "http://ingtechbd.com/demo/attendance/insert.php";
+                String url = "http://ingtechbd.com/demo/attendance/insert.php";
 
-            // Request a string response from the provided URL.
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d("response", response);
-                            Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
-                            inTime.setChecked(false);
-                            inTime.setEnabled(false);
-                            // Display the response string.
-                            //_response.setText(response);
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    //_response.setText("That didn't work!");
+                // Request a string response from the provided URL.
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.d("response", response);
+                                Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
+                                inTime.setChecked(false);
+                                inTime.setEnabled(false);
+                                // Display the response string.
+                                //_response.setText(response);
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //_response.setText("That didn't work!");
+                    }
+                }) {
+                    //adding parameters to the request
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("employee_id", employee_id);
+                        params.put("in_time", sdf.format(cal.getTime()));
+                        params.put("out_time", "");
+                        params.put("date", date);
+                        params.put("remarks", remarksEdt);
+                        return params;
+                    }
+                };
+                // Add the request to the RequestQueue.
+                queue.add(stringRequest);
+            }
+
+            if (outTime.isChecked() && !inTime.isEnabled()) {
+
+                cal1 = Calendar.getInstance();
+                sdf1 = new SimpleDateFormat("hh:mm:ss a");
+
+                RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
+                //this is the url where you want to send the request
+                //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
+
+                String url = "http://ingtechbd.com/demo/attendance/update.php";
+
+                // Request a string response from the provided URL.
+                StringRequest stringRequests = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.d("response", response);
+                                Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
+                                // Display the response string.
+                                //_response.setText(response);
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //_response.setText("That didn't work!");
+                    }
+                }) {
+                    //adding parameters to the request
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("out_time", sdf1.format(cal1.getTime()));
+                        params.put("employee_id", employee_id);
+                        params.put("date", date);
+                        return params;
+                    }
+                };
+                // Add the request to the RequestQueue.
+                queues.add(stringRequests);
+
+            }
+       }
+
+    private String getWifiName(Context context) {
+
+        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        if (manager.isWifiEnabled()) {
+            WifiInfo wifiInfo = manager.getConnectionInfo();
+            if (wifiInfo != null) {
+                NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
+                if (state == NetworkInfo.DetailedState.CONNECTED || state == NetworkInfo.DetailedState.OBTAINING_IPADDR) {
+                    return wifiInfo.getSSID();
                 }
-            }) {
-                //adding parameters to the request
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("employee_id", employee_id);
-                    params.put("in_time",sdf.format(cal.getTime()));
-                    params.put("out_time", "");
-                    params.put("date", date);
-                    params.put("remarks", remarksEdt);
-                    return params;
-                }
-            };
-            // Add the request to the RequestQueue.
-            queue.add(stringRequest);
+            }
         }
+        return null;
 
-        if (outTime.isChecked() && !inTime.isEnabled()) {
-
-            cal1 = Calendar.getInstance();
-            sdf1 = new SimpleDateFormat("hh:mm:ss a");
-
-            RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
-            //this is the url where you want to send the request
-            //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
-
-            String url = "http://ingtechbd.com/demo/attendance/update.php";
-
-            // Request a string response from the provided URL.
-            StringRequest stringRequests = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d("response", response);
-                            Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
-                            // Display the response string.
-                            //_response.setText(response);
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    //_response.setText("That didn't work!");
-                }
-            }) {
-                //adding parameters to the request
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("out_time", sdf1.format(cal1.getTime()));
-                    params.put("employee_id", employee_id);
-                    params.put("date", date);
-                    return params;
-                }
-            };
-            // Add the request to the RequestQueue.
-            queues.add(stringRequests);
-
-        }
     }
 
     private void getValue(final String email) {
