@@ -10,4 +10,6 @@
 
     <color name="green">#56bc41</color>
     <color name="red">#de2525</color>
+
+    <color name="colorCell">#015093</color>
 </resources>

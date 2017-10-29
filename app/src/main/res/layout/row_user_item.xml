@@ -1,62 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background_selector"
-    android:padding="16dp">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
     <TextView
         android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Name"
-        android:textSize="25dp"
-        android:textStyle="bold"
-        android:textColor="@color/ColorPrimary"/>
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/cell_shape"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:text="@string/name" >
+    </TextView>
 
     <TextView
         android:id="@+id/inTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="In Time"
-        android:layout_marginTop="10dp"
-        android:textSize="15dp"
-        android:layout_below="@+id/name"
-        android:textStyle="bold"
-        android:textColor="@color/green"/>
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:background="@drawable/cell_shape"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:text="@string/in" >
+    </TextView>
 
     <TextView
         android:id="@+id/outTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Out Time"
-        android:textSize="15dp"
-        android:textColor="@color/red"
-        android:layout_below="@+id/inTime"
-        android:layout_alignLeft="@+id/inTime"
-        android:layout_alignStart="@+id/inTime"
-        android:layout_marginTop="5dp" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.5"
+        android:background="@drawable/cell_shape"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:text="@string/out" >
+    </TextView>
 
     <TextView
         android:id="@+id/dateValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date"
-        android:textColor="#000"
-        android:textSize="18dp"
-        android:layout_below="@+id/outTime"
-        android:layout_marginTop="8dp" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/cell_shape"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:text="@string/date" />
 
     <TextView
         android:id="@+id/remarks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Remarks"
-        android:textSize="18dp"
-        android:textColor="#000"
-        android:layout_alignTop="@+id/outTime"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/cell_shape"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:text="@string/remarks" >
+    </TextView>
 
-</RelativeLayout>
+</LinearLayout>

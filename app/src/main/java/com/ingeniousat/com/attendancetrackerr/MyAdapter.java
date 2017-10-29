@@ -1,10 +1,12 @@
 package com.ingeniousat.com.attendancetrackerr;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,70 +17,68 @@ import java.util.ArrayList;
 /**
  * Created by TONMOYPC on 10/25/2017.
  */
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class MyAdapter extends BaseAdapter {
 
     ArrayList<Employee> emplist;
-    WeakReference<Context> mContextWeakReference;
-    Context context;
+    Activity activity;
 
-    public MyAdapter(ArrayList<Employee> emplist, Context context) {
+    public MyAdapter(ArrayList<Employee> emplist, Activity activity) {
+        super();
         this.emplist = new ArrayList<>(emplist);
-        this.mContextWeakReference = new WeakReference<Context>(context);
+        this.activity = activity;
     }
 
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        Context context = mContextWeakReference.get();
-
-        if (context != null) {
-
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_user_item, parent, false);
-
-            return new MyViewHolder(itemView, context);
-        }
-
-        return null;
-    }
-
-    @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
-
-        Context context = mContextWeakReference.get();
-
-        if (context == null) {
-            return;
-        }
-
-        Employee employee = emplist.get(position);
-
-        //Toast.makeText(context, ""+employee.getDate(), Toast.LENGTH_SHORT).show();
-        holder.TvName.setText(employee.getName());
-        holder.TvInTime.setText(employee.getInTime());
-        holder.TvOutTime.setText(employee.getOutTime());
-        holder.TvRemarks.setText(employee.getRemarks());
-        holder.TvDate.setText(employee.getDate());
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return emplist.size();
     }
 
-    //holder
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
-
-        public TextView TvName,TvInTime, TvOutTime, TvRemarks, TvDate;
-        public LinearLayout ll;
-
-        public MyViewHolder(View itemView, final Context context) {
-
-            super(itemView);
-            TvName = (TextView) itemView.findViewById(R.id.name);
-            TvInTime = (TextView) itemView.findViewById(R.id.inTime);
-            TvOutTime = (TextView) itemView.findViewById(R.id.outTime);
-            TvRemarks = (TextView) itemView.findViewById(R.id.remarks);
-            TvDate = (TextView) itemView.findViewById(R.id.dateValue);
-        }
+    @Override
+    public Object getItem(int position) {
+        return emplist.get(position);
     }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+
+    private class ViewHolder {
+        TextView mName;
+        TextView mIntime;
+        TextView mOutime;
+        TextView mDate;
+        TextView mRemarks;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+
+        ViewHolder holder;
+        LayoutInflater inflater = activity.getLayoutInflater();
+
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.row_user_item, null);
+            holder = new ViewHolder();
+            holder.mName = (TextView) convertView.findViewById(R.id.name);
+            holder.mIntime = (TextView) convertView.findViewById(R.id.inTime);
+            holder.mOutime = (TextView) convertView.findViewById(R.id.outTime);
+            holder.mDate = (TextView) convertView.findViewById(R.id.dateValue);
+            holder.mRemarks = (TextView) convertView.findViewById(R.id.remarks);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        Employee item = emplist.get(position);
+        holder.mName.setText(item.getName().toString());
+        holder.mIntime.setText(item.getInTime().toString());
+        holder.mOutime.setText(item.getOutTime().toString());
+        holder.mDate.setText(item.getDate().toString());
+        holder.mRemarks.setText(item.getRemarks().toString());
+
+        return convertView;
+    }
+
 }
