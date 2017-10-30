@@ -15,6 +15,7 @@ import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import android.view.View;
@@ -53,7 +54,7 @@ public class AttendanceActivity extends AppCompatActivity {
     Calendar cal,cal1;
     SimpleDateFormat sdf,sdf1;
     String employee_id;
-    String remarksEdt,date;
+    String remarksEdt,date,status,totaltime;
     boolean value;
     String employeeid;
     String urlvalue = "http://ingtechbd.com/demo/attendance/getvalue.php";
@@ -109,9 +110,8 @@ public class AttendanceActivity extends AppCompatActivity {
         if (inTime.isChecked()) {
 
                 cal = Calendar.getInstance();
-                sdf = new SimpleDateFormat("hh:mm:ss a");
-                String t =
-                        remarksEdt = remarks.getText().toString();
+                sdf = new SimpleDateFormat("hh:mm a");
+                String t = remarksEdt = remarks.getText().toString();
                 date = dateFormat.format(datetime);
 
                 RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
@@ -144,8 +144,39 @@ public class AttendanceActivity extends AppCompatActivity {
                         Map<String, String> params = new HashMap<>();
                         params.put("employee_id", employee_id);
                         params.put("in_time", sdf.format(cal.getTime()));
+
+                        try {
+                            String time2 = "10:30";
+                            SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+
+                            Date date1 = null;
+                            Date date2 = null;
+
+                                date1 = format.parse(sdf.format(cal.getTime()));
+                                date2 = format.parse(time2);
+                                long difference = date2.getTime() - date1.getTime();
+                                long diffMinutes = difference / (60 * 1000) % 60;
+                                Log.d("minute", String.valueOf(diffMinutes));
+                                if(diffMinutes <= 15){
+                                    status = "green";
+                                }
+                                else if(diffMinutes>15 && diffMinutes <= 30){
+                                    status = "yellow";
+                                }
+                                else if(diffMinutes >30){
+                                    status = "red";
+                                }
+                                else{
+                                    status = "null";
+                                }
+                                // Toast.makeText(HistoryActivity.this, ""+diffMinutes, Toast.LENGTH_SHORT).show();
+                                Log.d("difference", String.valueOf(difference/1000));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
                         params.put("out_time", "");
                         params.put("date", date);
+                        params.put("status", status);
                         params.put("remarks", remarksEdt);
                         return params;
                     }
@@ -157,7 +188,7 @@ public class AttendanceActivity extends AppCompatActivity {
             if (outTime.isChecked() && !inTime.isEnabled()) {
 
                 cal1 = Calendar.getInstance();
-                sdf1 = new SimpleDateFormat("hh:mm:ss a");
+                sdf1 = new SimpleDateFormat("hh:mm a");
 
                 RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
                 //this is the url where you want to send the request
@@ -186,6 +217,35 @@ public class AttendanceActivity extends AppCompatActivity {
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> params = new HashMap<>();
                         params.put("out_time", sdf1.format(cal1.getTime()));
+
+                        String inTime = sdf.format(cal.getTime());
+                        String outTime = sdf1.format(cal1.getTime());
+
+                        SimpleDateFormat format = new SimpleDateFormat("hh:mm a");
+
+                        Date d1 = null;
+                        Date d2 = null;
+
+                        try {
+                            d1 = format.parse(inTime);
+                            d2 = format.parse(outTime);
+
+                            //in milliseconds
+                            long diff = d2.getTime() - d1.getTime();
+
+                            long diffMinutes = diff / (60 * 1000) % 60;
+                            long diffHours = diff / (60 * 60 * 1000) % 24;
+
+                            String s1=Long.toString(diffMinutes);
+                            String s2=Long.toString(diffHours);
+
+                            totaltime = s1+":"+s2;
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        params.put("totaltime",totaltime);
                         params.put("employee_id", employee_id);
                         params.put("date", date);
                         return params;

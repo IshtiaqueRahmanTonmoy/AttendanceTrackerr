@@ -20,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -33,18 +34,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class HistoryActivity extends AppCompatActivity {
 
+    TextView nametext;
     EditText searchview;
     ListView listview;
     Button searchBtn;
     public static final String GETINFO_URL = "http://ingtechbd.com/demo/attendance/getemphistory.php";
     public static final String GETDATE_URL = "http://ingtechbd.com/demo/attendance/getnamebydate.php";
     public static final String GETNAME_URL = "http://ingtechbd.com/demo/attendance/getname.php";
-    String in_time,out_time,remarks,date,name,employee_id;
+    String in_time,out_time,remarks,date,name,employee_id,status;
     private ArrayList<Employee> usersList;
     RecyclerView recyclerView;
     MyAdapter mAdapter;
@@ -61,9 +66,11 @@ public class HistoryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
-        HistoryActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //HistoryActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         usersList = new ArrayList<>();
+
+        nametext = (TextView) findViewById(R.id.textview);
         listview = (ListView) findViewById(R.id.listview);
         searchdate = (Button) findViewById(R.id.searhDate);
         searchdate.setOnClickListener(new View.OnClickListener() {
@@ -171,14 +178,37 @@ public class HistoryActivity extends AppCompatActivity {
                                     remarks = json.getString("remarks");
                                     date = json.getString("date");
 
-                                    //Toast.makeText(HistoryActivity.this, "name"+in_time, Toast.LENGTH_SHORT).show();
+                                    String time2 = "10:30";
+                                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+
+                                    Date date1 = null;
+                                    Date date2 = null;
+                                    try {
+                                        date1 = format.parse(in_time);
+                                        date2 = format.parse(time2);
+                                        long difference = date2.getTime() - date1.getTime();
+                                        long diffMinutes = difference / (60 * 1000) % 60;
+
+                                        if(diffMinutes <= 15){
+                                            status = "green";
+                                        }
+                                        else if(diffMinutes>15 && diffMinutes <= 30){
+                                            status = "yellow";
+                                        }
+                                        else if(diffMinutes >30){
+                                            status = "red";
+                                        }
+                                        else{
+                                            status = "null";
+                                        }
+                                        // Toast.makeText(HistoryActivity.this, ""+diffMinutes, Toast.LENGTH_SHORT).show();
+                                        Log.d("difference", String.valueOf(difference/1000));
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
 
 
-                                    //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
-                                    //name = preferences.getString("Name", "");
-
-                                    //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
-                                    usersList.add(new Employee(name,in_time,out_time,remarks,date));
+                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,status));
                                     //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
                                     mAdapter = new MyAdapter(usersList, HistoryActivity.this);
@@ -240,6 +270,7 @@ public class HistoryActivity extends AppCompatActivity {
                                     //Getting json object
                                     JSONObject json = j.getJSONObject(i);
                                     name = json.getString("name");
+                                    nametext.setText(name);
                                     getsearch(value,name);
                                     //Toast.makeText(HistoryActivity.this, "name is"+name, Toast.LENGTH_SHORT).show();
                                     //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
@@ -296,11 +327,41 @@ public class HistoryActivity extends AppCompatActivity {
                                     remarks = json.getString("remarks");
                                     date = json.getString("date");
 
+                                    String time2 = "10:30";
+                                    SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+
+                                    Date date1 = null;
+                                    Date date2 = null;
+                                    try {
+                                        date1 = format.parse(in_time);
+                                        date2 = format.parse(time2);
+                                        long difference = date2.getTime() - date1.getTime();
+                                        long diffMinutes = difference / (60 * 1000) % 60;
+
+                                        if(diffMinutes <= 15){
+                                           status = "green";
+                                        }
+                                        else if(diffMinutes>15 && diffMinutes <= 30){
+                                            status = "yellow";
+                                        }
+                                        else if(diffMinutes >30){
+                                            status = "red";
+                                        }
+                                        else{
+                                            status = "null";
+                                        }
+                                       // Toast.makeText(HistoryActivity.this, ""+diffMinutes, Toast.LENGTH_SHORT).show();
+                                        Log.d("difference", String.valueOf(difference/1000));
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+
                                     //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
                                     //name = preferences.getString("Name", "");
 
                                     //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
-                                    usersList.add(new Employee(name,in_time,out_time,remarks,date));
+                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,status));
                                     //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
                                     mAdapter = new MyAdapter(usersList, HistoryActivity.this);

@@ -5,6 +5,9 @@
     <string name="out">Out Time</string>
     <string name="remarks">Remarks</string>
     <string name="date">Date</string>
+    <string name="status">Status</string>
+    <string name="workinghour">9</string>
+    <string name="whour">Working hour</string>
     <string name="submit">Submit</string>
 
     <string name="name">Name</string>

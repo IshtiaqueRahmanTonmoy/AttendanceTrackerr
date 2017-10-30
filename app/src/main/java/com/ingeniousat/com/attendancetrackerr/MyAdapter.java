@@ -48,8 +48,10 @@ public class MyAdapter extends BaseAdapter {
         TextView mName;
         TextView mIntime;
         TextView mOutime;
+        TextView mWorking;
         TextView mDate;
         TextView mRemarks;
+        TextView mStatus;
     }
 
     @Override
@@ -61,21 +63,37 @@ public class MyAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.row_user_item, null);
             holder = new ViewHolder();
-            holder.mName = (TextView) convertView.findViewById(R.id.name);
+            //holder.mName = (TextView) convertView.findViewById(R.id.name);
             holder.mIntime = (TextView) convertView.findViewById(R.id.inTime);
             holder.mOutime = (TextView) convertView.findViewById(R.id.outTime);
+            holder.mWorking = (TextView) convertView.findViewById(R.id.workingHour);
             holder.mDate = (TextView) convertView.findViewById(R.id.dateValue);
             holder.mRemarks = (TextView) convertView.findViewById(R.id.remarks);
+            holder.mStatus = (TextView) convertView.findViewById(R.id.status);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
         Employee item = emplist.get(position);
-        holder.mName.setText(item.getName().toString());
+
+        String valueget = item.getStatus().toString();
+        //holder.mName.setText(item.getName().toString());
         holder.mIntime.setText(item.getInTime().toString());
         holder.mOutime.setText(item.getOutTime().toString());
         holder.mDate.setText(item.getDate().toString());
+        if(valueget.equals("green")){
+            holder.mStatus.setText("good");
+        }
+        else if(valueget.equals("yellow")){
+            holder.mStatus.setText("moderate");
+        }
+        else if(valueget.equals("red")){
+            holder.mStatus.setText("late");
+        }
+        else{
+            holder.mStatus.setText("null");
+        }
         holder.mRemarks.setText(item.getRemarks().toString());
 
         return convertView;
