@@ -32,7 +32,7 @@
         android:id="@+id/workingHour"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.9"
+        android:layout_weight="1.5"
         android:background="@drawable/cell_shape"
         android:ellipsize="end"
         android:padding="5dp"

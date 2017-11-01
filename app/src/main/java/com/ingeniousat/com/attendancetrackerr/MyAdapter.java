@@ -2,6 +2,7 @@ package com.ingeniousat.com.attendancetrackerr;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,23 +78,24 @@ public class MyAdapter extends BaseAdapter {
 
         Employee item = emplist.get(position);
 
-        String valueget = item.getStatus().toString();
         //holder.mName.setText(item.getName().toString());
         holder.mIntime.setText(item.getInTime().toString());
         holder.mOutime.setText(item.getOutTime().toString());
+        holder.mWorking.setText(item.getTotaltime().toString());
         holder.mDate.setText(item.getDate().toString());
-        if(valueget.equals("green")){
-            holder.mStatus.setText("good");
+        if(item.getStatus().toString().equals("good")){
+            holder.mStatus.setText(item.getStatus().toString());
+            holder.mStatus.setTextColor(Color.parseColor("#008000"));
         }
-        else if(valueget.equals("yellow")){
-            holder.mStatus.setText("moderate");
+        else if(item.getStatus().toString().equals("moderate")){
+            holder.mStatus.setText(item.getStatus().toString());
+            holder.mStatus.setTextColor(Color.parseColor("#FFFF00"));
         }
-        else if(valueget.equals("red")){
-            holder.mStatus.setText("late");
+        else if(item.getStatus().toString().equals("poor")){
+            holder.mStatus.setText(item.getStatus().toString());
+            holder.mStatus.setTextColor(Color.parseColor("#FF0000"));
         }
-        else{
-            holder.mStatus.setText("null");
-        }
+        //holder.mStatus.setText(item.getStatus().toString());
         holder.mRemarks.setText(item.getRemarks().toString());
 
         return convertView;

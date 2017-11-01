@@ -39,7 +39,7 @@ public class SignUpActivity extends AppCompatActivity {
     int i=0;
     int employee_id;
     String name,email,designation,password;
-    String url = "http://ingtechbd.com/demo/attendance/register.php";
+    String url = "http://demo.ingtechbd.com/attendance/register.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

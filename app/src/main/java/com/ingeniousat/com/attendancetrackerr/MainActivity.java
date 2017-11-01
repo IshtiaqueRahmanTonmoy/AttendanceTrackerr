@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText empidEdt,passwordEdt;
     Button submitBtn;
-    String url = "http://ingtechbd.com/demo/attendance/login.php";
+    String url = "http://demo.ingtechbd.com/attendance/login.php";
     String employee_id,password;
     TextView signupText;
 
