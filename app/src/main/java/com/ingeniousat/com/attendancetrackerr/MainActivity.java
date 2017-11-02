@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     String url = "http://demo.ingtechbd.com/attendance/login.php";
     String employee_id,password;
     TextView signupText;
+    SharedPreferences pref;
+    SharedPreferences.Editor edt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,18 @@ public class MainActivity extends AppCompatActivity {
 
         empidEdt = (EditText) findViewById(R.id.employeeid);
         passwordEdt = (EditText) findViewById(R.id.password);
+
+        pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+        int getid = pref.getInt("id",0);
+        String empid = pref.getString("empid",null);
+        if(getid == 1){
+            Intent intent = new Intent(MainActivity.this,AttendanceActivity.class);
+            intent.putExtra("employeeid",empid);
+            startActivity(intent);
+            finish();
+        }
+
+
         signupText = (TextView) findViewById(R.id.creteaccount);
         signupText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,22 +64,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
-
-        String emailvalue = pref.getString("email","defaul_value");
-        if (pref.getBoolean("activity_executed", false)) {
-            Intent intent = new Intent(this, AttendanceActivity.class);
-
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("val","1");
-            editor.putString("email",emailvalue);
-            editor.apply();
-
-            startActivity(intent);
-            finish();
-        }
 
         submitBtn = (Button) findViewById(R.id.login_button);
         submitBtn.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +101,13 @@ public class MainActivity extends AppCompatActivity {
                                     else{
                                         Intent intent = new Intent(MainActivity.this,AttendanceActivity.class);
                                         intent.putExtra("employeeid",employee_id);
+
+                                        pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+                                        edt = pref.edit();
+                                        edt.putInt("id",1);
+                                        edt.putString("empid",employee_id);
+                                        edt.commit();
+
                                         startActivity(intent);
                                     }
 

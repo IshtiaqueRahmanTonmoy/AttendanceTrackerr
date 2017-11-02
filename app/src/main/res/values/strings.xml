@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AttendanceTrackerr</string>
+    <string name="app_name">AttendanceTracker</string>
 
     <string name="in">In Time</string>
     <string name="out">Out Time</string>

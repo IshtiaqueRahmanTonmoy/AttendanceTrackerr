@@ -59,6 +59,9 @@ public class AttendanceActivity extends AppCompatActivity {
     String employeeid;
     String urlvalue = "http://demo.ingtechbd.com/attendance/getvalue.php";
     long diff,diffMinutes,diffHours;
+    SharedPreferences pref;
+    SharedPreferences.Editor edt;
+    String currentdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,54 +71,76 @@ public class AttendanceActivity extends AppCompatActivity {
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
 
-        String routername = getWifiName(AttendanceActivity.this);
-        Log.d("name",routername);
+        Boolean value = isNetAvailable(AttendanceActivity.this);
+        if(value == true){
+            WifiManager wifiManager = (WifiManager) getSystemService (Context.WIFI_SERVICE);
+            WifiInfo info = wifiManager.getConnectionInfo ();
+            String ssid  = info.getSSID();
+            //Log.d("ssid",ssid);
+
+            if(ssid.equals("TP-LINK_F20C")) {
+                inTime.setEnabled(true);
+                outTime.setEnabled(true);
+            }
+        }
+        else{
+            inTime.setEnabled(false);
+            outTime.setEnabled(false);
+        }
+        //Toast.makeText(AttendanceActivity.this, ""+value, Toast.LENGTH_SHORT).show();
+
+        dateFormat = new SimpleDateFormat("d/M/yyyy");
+        datetime = new Date();
+
+
+
+        cal = Calendar.getInstance();
+        sdf = new SimpleDateFormat("hh:mm a");
 
         Intent intent = getIntent();
         employee_id = intent.getExtras().getString("employeeid");
 
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String name = preferences.getString("val", "");
-        if(!name.equalsIgnoreCase(""))
-        {
+        pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+        int getid = pref.getInt("activity_executed",0);
+        if(getid == 2){
             inTime.setEnabled(false);
         }
 
-        //Toast.makeText(AttendanceActivity.this, ""+val, Toast.LENGTH_SHORT).show();
-
-        dateFormat = new SimpleDateFormat("d/M/yyyy");
-        datetime = new Date();
-        //System.out.println(dateFormat.format(date));
-
-
         outTime.setChecked(false);
-
         remarks = (EditText) findViewById(R.id.remarksEdt);
 
     }
 
+    public Boolean isNetAvailable(Context con) {
+
+        try {
+            ConnectivityManager connectivityManager = (ConnectivityManager) con.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo wifiInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+            if(wifiInfo.isConnected()) {
+                return true;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     public void OnSubmit(View view) {
 
-        //getValue(email);
-        SharedPreferences pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
-        SharedPreferences.Editor edt = pref.edit();
-        edt.putString("email",employee_id);
-        edt.putBoolean("activity_executed", true);
-        edt.commit();
-
-
-        //Toast.makeText(AttendanceActivity.this, ""+name, Toast.LENGTH_SHORT).show();
-
         if (inTime.isChecked()) {
 
-                cal = Calendar.getInstance();
-                sdf = new SimpleDateFormat("hh:mm a");
-                String t = remarksEdt = remarks.getText().toString();
-                date = dateFormat.format(datetime);
+            String t = remarksEdt = remarks.getText().toString();
+            date = dateFormat.format(datetime);
 
+            pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+            edt = pref.edit();
+            edt.putString("email",employee_id);
+            edt.putInt("activity_executed",2);
+            edt.putString("intime",sdf.format(cal.getTime()));
+            edt.commit();
 
             try {
                 Date d1 = sdf.parse(sdf.format(cal.getTime()));
@@ -134,8 +159,6 @@ public class AttendanceActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-
 
             RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
                 //this is the url where you want to send the request
@@ -180,23 +203,29 @@ public class AttendanceActivity extends AppCompatActivity {
 
             if (outTime.isChecked() && !inTime.isEnabled()) {
 
+                date = dateFormat.format(datetime);
+                pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+                String intime = pref.getString("intime",null);
+                //Toast.makeText(AttendanceActivity.this, ""+intime, Toast.LENGTH_SHORT).show();
+
                 cal1 = Calendar.getInstance();
                 sdf1 = new SimpleDateFormat("hh:mm a");
 
                 try {
-                    Date d1 = sdf.parse(sdf.format(cal.getTime()));
+                    Date d1 = sdf.parse(intime);
+                    //Toast.makeText(AttendanceActivity.this, "date d1"+d1, Toast.LENGTH_SHORT).show();
                     Date d2 = sdf.parse(sdf1.format(cal1.getTime()));
                     Log.d("intime", String.valueOf(d1));
                     Log.d("outtime", String.valueOf(d2));
                     diff = d2.getTime() - d1.getTime();
+                    Log.d("differenece", String.valueOf(diff));
+                    //Toast.makeText(AttendanceActivity.this, ""+diff, Toast.LENGTH_SHORT).show();
                     diffHours = Math.abs(diff / (60 * 60 * 1000) % 24);
                     diffMinutes = Math.abs(diff/(60 * 1000) % 60);
                     hours = String.valueOf(diffHours);
                     minutes = String.valueOf(diffMinutes);
-                    hourmintues = ""+hour+"Hour"+":"+""+minute+""+"Minute";
-                    //Log.d("hourminute",hourminute);
-                    //Toast.makeText(AttendanceActivity.this, ""+hourminute, Toast.LENGTH_SHORT).show();
-                    //Toast.makeText(AttendanceActivity.this, ""+diffHours+""+diffMinutes, Toast.LENGTH_SHORT).show();
+                    hourmintues = ""+diffHours+"Hour"+":"+""+diffMinutes+""+"Minute";
+                    Log.d("totaltimeofhourandime",hourmintues);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -213,9 +242,8 @@ public class AttendanceActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(String response) {
                                 Log.d("response", response);
+                                outTime.setEnabled(false);
                                 Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
-                                // Display the response string.
-                                //_response.setText(response);
                             }
                         }, new Response.ErrorListener() {
                     @Override
@@ -227,10 +255,12 @@ public class AttendanceActivity extends AppCompatActivity {
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> params = new HashMap<>();
+                        //Log.d("allresultvalue",sdf1.format(cal1.getTime())+hourmintues+employee_id+date);
                         params.put("out_time", sdf1.format(cal1.getTime()));
-                        params.put("totaltime",hourmintues);
+                        params.put("totaltime", hourmintues);
                         params.put("employee_id", employee_id);
                         params.put("date", date);
+                        Log.d("params",params.toString());
                         return params;
                     }
                 };
