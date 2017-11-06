@@ -3,21 +3,28 @@ package com.ingeniousat.com.attendancetrackerr;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -46,22 +53,26 @@ import java.util.Map;
 
 public class AttendanceActivity extends AppCompatActivity {
 
-    CheckBox inTime,outTime;
+    CheckBox inTime, outTime;
     EditText remarks;
     Button submit;
     Date datetime;
     DateFormat dateFormat;
-    Calendar cal,cal1;
-    SimpleDateFormat sdf,sdf1;
+    Calendar cal, cal1;
+    SimpleDateFormat sdf, sdf1;
     String employee_id;
-    String remarksEdt,date,status,totaltime,hour,minute,hourminute,hours,minutes,hourmintues;
+    String remarksEdt, date, status, totaltime, hour, minute, hourminute, hours, minutes, hourmintues;
     boolean value;
     String employeeid;
     String urlvalue = "http://demo.ingtechbd.com/attendance/getvalue.php";
-    long diff,diffMinutes,diffHours;
+    long diff, diffMinutes, diffHours;
     SharedPreferences pref;
     SharedPreferences.Editor edt;
     String currentdate;
+    WifiManager wifiManager;
+    WifiInfo info;
+    private LocationManager locationManager;
+    private String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,24 +81,11 @@ public class AttendanceActivity extends AppCompatActivity {
 
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
+        submit = (Button)findViewById(R.id.login_button);
 
-        Boolean value = isNetAvailable(AttendanceActivity.this);
-        if(value == true){
-            WifiManager wifiManager = (WifiManager) getSystemService (Context.WIFI_SERVICE);
-            WifiInfo info = wifiManager.getConnectionInfo ();
-            String ssid  = info.getSSID();
-            //Log.d("ssid",ssid);
 
-            if(ssid.equals("TP-LINK_F20C")) {
-                inTime.setEnabled(true);
-                outTime.setEnabled(true);
-            }
-        }
-        else{
-            inTime.setEnabled(false);
-            outTime.setEnabled(false);
-        }
-        //Toast.makeText(AttendanceActivity.this, ""+value, Toast.LENGTH_SHORT).show();
+        inTime.setEnabled(true);
+        outTime.setEnabled(false);
 
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
@@ -106,6 +104,7 @@ public class AttendanceActivity extends AppCompatActivity {
         int getid = pref.getInt("activity_executed",0);
         if(getid == 2){
             inTime.setEnabled(false);
+            outTime.setEnabled(true);
         }
 
         outTime.setChecked(false);
@@ -127,6 +126,23 @@ public class AttendanceActivity extends AppCompatActivity {
         }
         return false;
     }
+
+    private void getEnable(String ssid) {
+        Log.d("ssid",ssid.toString());
+        //Toast.makeText(AttendanceActivity.this, ""+ssid, Toast.LENGTH_SHORT).show();
+        if(ssid.equals(info.getSSID())){
+            //Toast.makeText(AttendanceActivity.this, "wifi name"+info.getSSID(), Toast.LENGTH_SHORT).show();
+            inTime.setEnabled(true);
+            outTime.setEnabled(true);
+        }
+        else{
+            Toast.makeText(AttendanceActivity.this, "other", Toast.LENGTH_SHORT).show();
+            inTime.setEnabled(false);
+            outTime.setEnabled(false);
+        }
+    }
+
+
 
     public void OnSubmit(View view) {
 
@@ -175,6 +191,7 @@ public class AttendanceActivity extends AppCompatActivity {
                                 Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
                                 inTime.setChecked(false);
                                 inTime.setEnabled(false);
+                                outTime.setEnabled(true);
                                 // Display the response string.
                                 //_response.setText(response);
                             }
@@ -211,6 +228,9 @@ public class AttendanceActivity extends AppCompatActivity {
                 cal1 = Calendar.getInstance();
                 sdf1 = new SimpleDateFormat("hh:mm a");
 
+
+
+
                 try {
                     Date d1 = sdf.parse(intime);
                     //Toast.makeText(AttendanceActivity.this, "date d1"+d1, Toast.LENGTH_SHORT).show();
@@ -243,6 +263,8 @@ public class AttendanceActivity extends AppCompatActivity {
                             public void onResponse(String response) {
                                 Log.d("response", response);
                                 outTime.setEnabled(false);
+                                remarks.setText("");
+                                submit.setEnabled(false);
                                 Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {

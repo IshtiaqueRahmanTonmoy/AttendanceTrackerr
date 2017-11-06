@@ -8,6 +8,7 @@ android {
         applicationId "com.ingeniousat.com.attendancetrackerr"
         minSdkVersion 15
         targetSdkVersion 25
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
     }
