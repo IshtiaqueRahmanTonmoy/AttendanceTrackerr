@@ -2,6 +2,7 @@ package com.ingeniousat.com.attendancetrackerr;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -14,7 +15,9 @@ import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -112,6 +115,7 @@ public class HistoryActivity extends AppCompatActivity {
                     usersList.clear();
                     mAdapter = new MyAdapter(usersList, HistoryActivity.this);
                     listview.setAdapter(mAdapter);
+
                     //recyclerView.setAdapter(mAdapter);
                     //preferences.edit().clear().commit();
                 }
@@ -151,7 +155,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     private void getDate(final String datevalue) {
         Log.d("datevalue",datevalue);
-        Toast.makeText(HistoryActivity.this, ""+datevalue, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(HistoryActivity.this, ""+datevalue, Toast.LENGTH_SHORT).show();
         Uri.Builder builder = Uri.parse(GETDATE_URL).buildUpon();
         builder.appendQueryParameter("date",datevalue);
         String loginUrl=builder.build().toString();
@@ -162,38 +166,51 @@ public class HistoryActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         try {
-
-                            Log.d("response",response.toString());
+                            Log.d("response", response.toString());
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray j = jsonObject.getJSONArray("result");
                             //Toast.makeText(HistoryActivity.this, "length"+j.length(), Toast.LENGTH_SHORT).show();
-                            for(int i=0;i<j.length();i++){
+                            if (j != null && j.length() > 0){
 
+                                for (int i = 0; i < j.length(); i++) {
+                                    try {
+                                //Getting json object
+                                JSONObject json = j.getJSONObject(i);
+                                Log.d("json", json.toString());
+                                name = json.getString("name");
+                                //Toast.makeText(HistoryActivity.this, ""+name, Toast.LENGTH_SHORT).show();
+                                in_time = json.getString("in_time");
+                                out_time = json.getString("out_time");
+                                remarks = json.getString("remarks");
+                                date = json.getString("date");
+                                status = json.getString("status");
+                                totaltime = json.getString("totaltime");
+
+                                usersList.add(new Employee(name, in_time, out_time, remarks, date, status, totaltime));
                                 //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
-                                try {
-                                    //Getting json object
-                                    JSONObject json = j.getJSONObject(i);
-                                    Log.d("json",json.toString());
-                                    name = json.getString("name");
-                                    //Toast.makeText(HistoryActivity.this, ""+name, Toast.LENGTH_SHORT).show();
-                                    in_time = json.getString("in_time");
-                                    out_time = json.getString("out_time");
-                                    remarks = json.getString("remarks");
-                                    date = json.getString("date");
-                                    status = json.getString("status");
-                                    totaltime = json.getString("totaltime");
 
-                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,status,totaltime));
-                                    //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
+                                mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                listview.setAdapter(mAdapter);
+                                        listview.setOnTouchListener(new View.OnTouchListener() {
+                                            @Override
+                                            public boolean onTouch(View v, MotionEvent event) {
 
-                                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
-                                    listview.setAdapter(mAdapter);
-                                    //usersList.clear();
-                                    mAdapter.notifyDataSetChanged();
+                                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
 
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
+                                                return false;
+                                            }
+                                        });
+                                //usersList.clear();
+                                mAdapter.notifyDataSetChanged();
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                        else{
+                                Toast.makeText(HistoryActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {
@@ -313,6 +330,17 @@ public class HistoryActivity extends AppCompatActivity {
 
                                     mAdapter = new MyAdapter(usersList, HistoryActivity.this);
                                     listview.setAdapter(mAdapter);
+
+                                    listview.setOnTouchListener(new View.OnTouchListener() {
+                                        @Override
+                                        public boolean onTouch(View v, MotionEvent event) {
+
+                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+
+                                            return false;
+                                        }
+                                    });
                                     //usersList.clear();
                                     mAdapter.notifyDataSetChanged();
 

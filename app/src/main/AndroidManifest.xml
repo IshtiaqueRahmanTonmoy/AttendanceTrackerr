@@ -27,6 +27,13 @@
         <activity android:name=".AttendanceActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".HistoryActivity"></activity>
+        <activity android:name=".ReminderActivity"></activity>
+        <activity android:name=".AddReminderActivity"></activity>
+        <activity android:name=".AddReminderFirstActivity"></activity>
+        <activity android:name=".AddReminderActivitySecond"></activity>
+        <activity android:name=".EditReminderActivity"></activity>
+        <activity android:name=".ViewingDatesActivity"></activity>
+        <activity android:name=".ViewActivity"></activity>
     </application>
 
 </manifest>

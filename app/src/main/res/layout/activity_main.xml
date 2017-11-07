@@ -67,26 +67,6 @@
             android:text="@string/signin" />
 
 
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:paddingTop="8dp" >
-
-            <TextView
-                android:id="@+id/forgot_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:padding="5dp"
-                android:text="@string/forgot"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-        </LinearLayout>
-
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -114,24 +94,5 @@
 
         </LinearLayout>
     </LinearLayout>
-
-    <TextView android:id="@+id/link_signup"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginTop="30dp"
-        android:text="Don't have an account?"
-        android:gravity="center"
-        android:textSize="12dip"/>
-
-    <TextView android:id="@+id/creteaccount"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:layout_marginTop="2dp"
-        android:text="CREATE ACCOUNT"
-        android:gravity="center"
-        android:textColor="@color/ColorPrimary"
-        android:textSize="14dip"/>
 
 </LinearLayout>

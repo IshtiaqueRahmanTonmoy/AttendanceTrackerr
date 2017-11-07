@@ -56,15 +56,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        signupText = (TextView) findViewById(R.id.creteaccount);
-        signupText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,SignUpActivity.class);
-                startActivity(intent);
-            }
-        });
-
         submitBtn = (Button) findViewById(R.id.login_button);
         submitBtn.setOnClickListener(new View.OnClickListener() {
 

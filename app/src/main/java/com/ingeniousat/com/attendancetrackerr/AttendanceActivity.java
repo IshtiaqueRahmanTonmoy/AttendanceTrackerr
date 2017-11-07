@@ -89,7 +89,8 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
         event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                  Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
+                  startActivity(intent);
             }
         });
 
