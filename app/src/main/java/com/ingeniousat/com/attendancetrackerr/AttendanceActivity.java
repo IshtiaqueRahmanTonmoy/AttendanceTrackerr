@@ -18,7 +18,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-
+import android.Manifest;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -51,11 +51,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AttendanceActivity extends AppCompatActivity {
+public class AttendanceActivity extends AppCompatActivity implements LocationListener {
 
     CheckBox inTime, outTime;
     EditText remarks;
-    Button submit;
+    Button submit,event;
     Date datetime;
     DateFormat dateFormat;
     Calendar cal, cal1;
@@ -73,6 +73,8 @@ public class AttendanceActivity extends AppCompatActivity {
     WifiInfo info;
     private LocationManager locationManager;
     private String provider;
+    double latitude,longitude;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,38 @@ public class AttendanceActivity extends AppCompatActivity {
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
         submit = (Button)findViewById(R.id.login_button);
+        event = (Button) findViewById(R.id.eventSceduleView);
 
+        event.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+        // Creating an empty criteria object
+        Criteria criteria = new Criteria();
+
+        // Getting the name of the provider that meets the criteria
+        provider = locationManager.getBestProvider(criteria, false);
+
+        if(provider!=null && !provider.equals("")){
+
+            // Get the location from the given provider
+            Location location = locationManager.getLastKnownLocation(provider);
+
+            locationManager.requestLocationUpdates(provider, 20000, 1, this);
+
+            if(location!=null)
+                onLocationChanged(location);
+            else
+                Toast.makeText(getBaseContext(), "Location can't be retrieved", Toast.LENGTH_SHORT).show();
+
+        }else{
+            Toast.makeText(getBaseContext(), "No Provider Found", Toast.LENGTH_SHORT).show();
+        }
 
         inTime.setEnabled(true);
         outTime.setEnabled(false);
@@ -337,6 +370,27 @@ public class AttendanceActivity extends AppCompatActivity {
         });
         // Add the request to the RequestQueue.
         queues.add(stringRequests);
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Toast.makeText(AttendanceActivity.this, "latitude"+location.getLatitude()+"longitute"+location.getLongitude(), Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
 
     }
 }

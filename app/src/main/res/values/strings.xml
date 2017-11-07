@@ -18,5 +18,6 @@
     <string name="signin">Sign In</string>
     <string name="forgot">Forgot Password</string>
     <string name="searchbydate">Search by date</string>
+    <string name="event">Add Event Schedule</string>
 
 </resources>
