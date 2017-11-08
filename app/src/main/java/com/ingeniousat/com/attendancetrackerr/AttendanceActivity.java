@@ -55,7 +55,7 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
 
     CheckBox inTime, outTime;
     EditText remarks;
-    Button submit,event;
+    Button submit,event,report;
     Date datetime;
     DateFormat dateFormat;
     Calendar cal, cal1;
@@ -81,16 +81,29 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
 
+        Intent intent = getIntent();
+        employee_id = intent.getExtras().getString("employeeid");
+
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
         submit = (Button)findViewById(R.id.login_button);
         event = (Button) findViewById(R.id.eventSceduleView);
+        report = (Button)findViewById(R.id.reportView);
 
         event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                   Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
                   startActivity(intent);
+            }
+        });
+
+        report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AttendanceActivity.this,ReportActivity.class);
+                intent.putExtra("empid",employee_id);
+                startActivity(intent);
             }
         });
 
@@ -129,8 +142,7 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
         cal = Calendar.getInstance();
         sdf = new SimpleDateFormat("hh:mm a");
 
-        Intent intent = getIntent();
-        employee_id = intent.getExtras().getString("employeeid");
+
 
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 

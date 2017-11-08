@@ -19,9 +19,14 @@
     <string name="forgot">Forgot Password</string>
     <string name="searchbydate">Search</string>
     <string name="event">Add Event Schedule</string>
+    <string name="but_done">Done</string>
 
+    <string name="reportview">View Report</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_view_dates">viewDatesActivity</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_tab_start_date">Start Date</string>
+    <string name="ttile_tab_end_date">End Date</string>
+
 
 </resources>

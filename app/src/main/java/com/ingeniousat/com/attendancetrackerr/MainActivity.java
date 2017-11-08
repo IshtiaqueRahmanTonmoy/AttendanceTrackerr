@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                                 else {
 
-                                    if(employee_id.equals("238")){
+                                    if(employee_id.equals("1001")){
                                         Intent intent = new Intent(MainActivity.this,AdminActivity.class);
                                         startActivity(intent);
                                     }

@@ -60,10 +60,10 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 i++;
-                Random rand = new Random();
+                //Random rand = new Random();
 
                 // Generate random integers in range 0 to 999
-                employee_id = rand.nextInt(1000+i);
+                employee_id = Integer.parseInt("00"+i);
 
                 name = nameEdt.getText().toString();
                 email = emailEdt.getText().toString();

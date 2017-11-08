@@ -1,28 +1,18 @@
 package com.ingeniousat.com.attendancetrackerr;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,94 +28,49 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 
-public class HistoryActivity extends AppCompatActivity  implements DateRangePickerFragment.OnDateRangeSelectedListener{
+public class ReportActivity extends AppCompatActivity implements DateRangePickerFragment.OnDateRangeSelectedListener{
 
-    TextView nametext;
-    EditText searchview;
+    SharedPreferences pref;
+    EditText searhText;
     ListView listview;
-    Button searchBtn;
-    public static final String GETINFO_URL = "http://demo.ingtechbd.com/attendance/getemphistory.php";
-    public static final String GETDATE_URL = "http://demo.ingtechbd.com/attendance/getnamebydate.php";
-    public static final String GETDATEPICKER_URL = "http://demo.ingtechbd.com/attendance/getbydatepicker.php";
-    public static final String GETNAME_URL = "http://demo.ingtechbd.com/attendance/getname.php";
-    String in_time,out_time,remarks,date,name,employee_id,status,totaltime;
-    private ArrayList<Employee> usersList;
-    RecyclerView recyclerView;
+    TextView nametext;
     MyAdapter mAdapter;
-    private int mYear,month,day,year;
-    private int mMonth;
-    private int mDay;
-    static final int DATE_DIALOG_ID = 0;
-    CheckBox searchbydate,searchybyid;
-    Button searchdate;
+    private ArrayList<Employee> usersList;
+    public static final String GETNAME_URL = "http://demo.ingtechbd.com/attendance/getname.php";
+    public static final String GETINFO_URL = "http://demo.ingtechbd.com/attendance/getemphistory.php";
+    public static final String GETDATEPICKER_URL = "http://demo.ingtechbd.com/attendance/getbydatepicker.php";
+    String in_time,out_time,remarks,date,name,employee_id,status,totaltime;
+    CheckBox searchybydate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history);
-        //HistoryActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setContentView(R.layout.activity_report);
 
-        usersList = new ArrayList<>();
+        pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+        String empid = pref.getString("empid",null);
 
-        nametext = (TextView) findViewById(R.id.textview);
         listview = (ListView) findViewById(R.id.listview);
+        nametext = (TextView) findViewById(R.id.textview);
+        searhText = (EditText) findViewById(R.id.searhText);
+        searchybydate = (CheckBox) findViewById(R.id.searchbydate);
+        searhText.setText(empid);
+        searhText.setTextIsSelectable(false);
 
-        final Calendar c = Calendar.getInstance();
-        mYear = c.get(Calendar.YEAR);
-        mMonth = c.get(Calendar.MONTH);
-        mDay = c.get(Calendar.DAY_OF_MONTH);
-
-        searchview = (EditText) findViewById(R.id.searhText);
-        searchview.setFocusable(false);
-        searchbydate = (CheckBox) findViewById(R.id.searchbyempid);
-        searchybyid = (CheckBox) findViewById(R.id.searchbydate);
-
-        searchbydate.setOnClickListener(new View.OnClickListener() {
+        searchybydate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(searchbydate.isChecked()){
-                    searchview.setText("");
-                    searchybyid.setChecked(false);
-                    searchview.setFocusableInTouchMode(true);
-                    searchview.requestFocus();
-                    searchview.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            String value = searchview.getText().toString();
-                            if(value!=null) {
-                                getname(value);
-                                //getsearch(value);
-                            }
-                            if(searchview.length() == 0){
-                                usersList.clear();
-                                mAdapter = new MyAdapter(usersList, HistoryActivity.this);
-                                listview.setAdapter(mAdapter);
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
-        searchybyid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(searchybyid.isChecked()){
-                    searchview.setText("");
-                    searchbydate.setChecked(false);
-                    searchview.setFocusableInTouchMode(true);
-                    searchview.requestFocus();
-                    searchview.setOnClickListener(new View.OnClickListener() {
+                if(searchybydate.isChecked()){
+                    searhText.setText("");
+                    searhText.setFocusableInTouchMode(true);
+                    searhText.requestFocus();
+                    searhText.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
 
-                            DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(HistoryActivity.this,false);
+                            DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(ReportActivity.this,false);
                             dateRangePickerFragment.show(getSupportFragmentManager(),"datePicker");
                             //showDialog(DATE_DIALOG_ID);
                         }
@@ -133,7 +78,8 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 }
             }
         });
-        searchview.addTextChangedListener(new TextWatcher() {
+
+        searhText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -141,14 +87,13 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String value = searchview.getText().toString();
+                String value = searhText.getText().toString();
                 if(value!=null) {
                     getname(value);
                     //getsearch(value);
                 }
-                if(searchview.length() == 0){
-                    usersList.clear();
-                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                if(searhText.length() == 0){
+                    mAdapter = new MyAdapter(usersList, ReportActivity.this);
                     listview.setAdapter(mAdapter);
 
                     //recyclerView.setAdapter(mAdapter);
@@ -162,122 +107,6 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
             }
         });
     }
-
-    private DatePickerDialog.OnDateSetListener mDateSetListener =
-            new DatePickerDialog.OnDateSetListener() {
-
-                public void onDateSet(DatePicker view, int year,
-                                      int monthOfYear, int dayOfMonth) {
-                    mYear = year;
-                    mMonth = monthOfYear;
-                    mDay = dayOfMonth;
-
-                    updateDisplay();
-                }
-            };
-
-    private void updateDisplay() {
-
-        StringBuilder strbuilder =  new StringBuilder()
-                // Month is 0 based so add 1
-                .append(mDay).append("/")
-                .append(mMonth + 1).append("/")
-                .append(mYear).append(" ");
-        String datevalue = strbuilder.toString();
-        getDate(datevalue);
-        /// /Toast.makeText(HistoryActivity.this, ""+strbuilder.toString(), Toast.LENGTH_SHORT).show();
-    }
-
-    private void getDate(final String datevalue) {
-        Log.d("datevalue",datevalue);
-        //Toast.makeText(HistoryActivity.this, ""+datevalue, Toast.LENGTH_SHORT).show();
-        Uri.Builder builder = Uri.parse(GETDATE_URL).buildUpon();
-        builder.appendQueryParameter("date",datevalue);
-        String loginUrl=builder.build().toString();
-        Log.d("loginurl",loginUrl);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            Log.d("response", response.toString());
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray j = jsonObject.getJSONArray("result");
-                            //Toast.makeText(HistoryActivity.this, "length"+j.length(), Toast.LENGTH_SHORT).show();
-                            if (j != null && j.length() > 0){
-
-                                for (int i = 0; i < j.length(); i++) {
-                                    try {
-                                        //Getting json object
-                                        JSONObject json = j.getJSONObject(i);
-                                        Log.d("json", json.toString());
-                                        name = json.getString("name");
-                                        //Toast.makeText(HistoryActivity.this, ""+name, Toast.LENGTH_SHORT).show();
-                                        in_time = json.getString("in_time");
-                                        out_time = json.getString("out_time");
-                                        remarks = json.getString("remarks");
-                                        date = json.getString("date");
-                                        status = json.getString("status");
-                                        totaltime = json.getString("totaltime");
-
-                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, status, totaltime));
-                                        //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
-
-                                        mAdapter = new MyAdapter(usersList, HistoryActivity.this);
-                                        listview.setAdapter(mAdapter);
-                                        listview.setOnTouchListener(new View.OnTouchListener() {
-                                            @Override
-                                            public boolean onTouch(View v, MotionEvent event) {
-
-                                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
-
-                                                return false;
-                                            }
-                                        });
-                                        //usersList.clear();
-                                        mAdapter.notifyDataSetChanged();
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                            else{
-                                Toast.makeText(HistoryActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("response",response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("error", String.valueOf(error));
-                        //You can handle error here if you want
-                    }
-                }){
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
-        requestQueue.add(stringRequest);
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case DATE_DIALOG_ID:
-                return new DatePickerDialog(this,
-                        mDateSetListener,
-                        mYear, mMonth, mDay);
-        }
-        return null;
-    }
-
 
     private void getname(final String value) {
 
@@ -326,7 +155,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 }){
         };
 
-        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
+        RequestQueue requestQueue = Volley.newRequestQueue(ReportActivity.this);
         requestQueue.add(stringRequest);
     }
 
@@ -363,7 +192,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                     usersList.add(new Employee(name,in_time,out_time,remarks,date,status,totaltime));
                                     //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                    mAdapter = new MyAdapter(usersList, ReportActivity.this);
                                     listview.setAdapter(mAdapter);
 
                                     listview.setOnTouchListener(new View.OnTouchListener() {
@@ -371,7 +200,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                         public boolean onTouch(View v, MotionEvent event) {
 
                                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+                                            imm.hideSoftInputFromWindow(searhText.getWindowToken(), 0);
 
                                             return false;
                                         }
@@ -398,7 +227,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 }){
         };
 
-        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
+        RequestQueue requestQueue = Volley.newRequestQueue(ReportActivity.this);
         requestQueue.add(stringRequest);
     }
 
@@ -409,7 +238,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
         String firstdate = startDay+"/"+startMonth+"/"+startYear;
         String lastdate = endDay+"/"+endMonth+"/"+endYear;
 
-        searchview.setText(firstdate+"-"+lastdate);
+        searhText.setText(firstdate+"-"+lastdate);
 
         //Toast.makeText(HistoryActivity.this, ""+datevalue, Toast.LENGTH_SHORT).show();
         Uri.Builder builder = Uri.parse(GETDATEPICKER_URL).buildUpon();
@@ -446,14 +275,14 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                         usersList.add(new Employee(name, in_time, out_time, remarks, date, status, totaltime));
                                         //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                        mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                        mAdapter = new MyAdapter(usersList, ReportActivity.this);
                                         listview.setAdapter(mAdapter);
                                         listview.setOnTouchListener(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent event) {
 
                                                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                                imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+                                                imm.hideSoftInputFromWindow(searhText.getWindowToken(), 0);
 
                                                 return false;
                                             }
@@ -467,7 +296,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                 }
                             }
                             else{
-                                Toast.makeText(HistoryActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ReportActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {
@@ -485,8 +314,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 }){
         };
 
-        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
+        RequestQueue requestQueue = Volley.newRequestQueue(ReportActivity.this);
         requestQueue.add(stringRequest);
     }
 }
-

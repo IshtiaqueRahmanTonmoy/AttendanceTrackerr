@@ -92,6 +92,21 @@
                 android:onClick="OnSubmit"
                 android:textColor="@color/textColorPrimary"
                 android:text="@string/event" />
+
+            <Button
+                android:id="@+id/reportView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="4dp"
+                android:layout_weight="1"
+                android:background="@color/ColorPrimary"
+                android:tag="facebook_login_button"
+                android:onClick="OnReportView"
+                android:textColor="@color/textColorPrimary"
+                android:text="@string/reportview" />
         </LinearLayout>
 
     </LinearLayout>
