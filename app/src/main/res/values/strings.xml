@@ -17,7 +17,7 @@
     <string name="password">Password</string>
     <string name="signin">Sign In</string>
     <string name="forgot">Forgot Password</string>
-    <string name="searchbydate">Search by date</string>
+    <string name="searchbydate">Search</string>
     <string name="event">Add Event Schedule</string>
 
     <string name="action_settings">Settings</string>

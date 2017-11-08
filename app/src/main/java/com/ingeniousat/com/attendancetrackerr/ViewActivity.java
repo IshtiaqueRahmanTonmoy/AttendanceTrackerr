@@ -1,5 +1,8 @@
 package com.ingeniousat.com.attendancetrackerr;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,12 +12,14 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ViewActivity extends AppCompatActivity {
 
+    private PendingIntent pendingIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +32,22 @@ public class ViewActivity extends AppCompatActivity {
         ArrayList<Reminder> remindersArray = dbHandler.allReminders();
 
         List<Map<String, String>> allRemindersList = new ArrayList<Map<String, String>>(2);
+
+        Intent alarmIntent = new Intent(ViewActivity.this, AlarmReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(ViewActivity.this, 0, alarmIntent, 0);
+
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        int interval = 1000 * 60 * 20;
+
+        /* Set the alarm to start at 10:30 AM */
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 10);
+        calendar.set(Calendar.MINUTE, 30);
+
+        /* Repeating on every 20 minutes interval */
+        manager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000 * 60 * 20, pendingIntent);
 
         for (int i = 0; i < remindersArray.size(); i++) {
             Map<String, String> datum = new HashMap<String, String>(2);

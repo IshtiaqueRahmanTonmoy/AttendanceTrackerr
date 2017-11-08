@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
@@ -60,10 +61,8 @@ public class HistoryActivity extends AppCompatActivity {
     private int mMonth;
     private int mDay;
     static final int DATE_DIALOG_ID = 0;
-
-    //SharedPreferences preferences;
-    //SharedPreferences.Editor editor;
-   Button searchdate;
+    CheckBox searchbydate,searchybyid;
+    Button searchdate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,16 +87,54 @@ public class HistoryActivity extends AppCompatActivity {
         mMonth = c.get(Calendar.MONTH);
         mDay = c.get(Calendar.DAY_OF_MONTH);
 
-
-        //recyclerView = (RecyclerView) findViewById(R.id.rv_my_recycler_view);
-        //recyclerView.setHasFixedSize(true);
-
-        //LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        //recyclerView.setLayoutManager(layoutManager);
-
         searchview = (EditText) findViewById(R.id.searhText);
+        searchview.setFocusable(false);
+        searchbydate = (CheckBox) findViewById(R.id.searchbyempid);
+        searchybyid = (CheckBox) findViewById(R.id.searchbydate);
 
+        searchbydate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(searchbydate.isChecked()){
+                    searchybyid.setChecked(false);
+                    searchview.setFocusableInTouchMode(true);
+                    searchview.requestFocus();
+                    searchview.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            String value = searchview.getText().toString();
+                            if(value!=null) {
+                                getname(value);
+                                //getsearch(value);
+                            }
+                            if(searchview.length() == 0){
+                                usersList.clear();
+                                mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                listview.setAdapter(mAdapter);
+                            }
+                        }
+                    });
+                }
+            }
+        });
 
+        searchybyid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                  if(searchybyid.isChecked()){
+                      searchbydate.setChecked(false);
+                      searchview.setFocusableInTouchMode(true);
+                      searchview.requestFocus();
+                      searchview.setOnClickListener(new View.OnClickListener() {
+                          @Override
+                          public void onClick(View view) {
+                              searchview.setText("");
+                              showDialog(DATE_DIALOG_ID);
+                          }
+                      });
+                  }
+            }
+        });
         searchview.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
