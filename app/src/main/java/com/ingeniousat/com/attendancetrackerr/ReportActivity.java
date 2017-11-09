@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -42,70 +43,81 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
     public static final String GETINFO_URL = "http://demo.ingtechbd.com/attendance/getemphistory.php";
     public static final String GETDATEPICKER_URL = "http://demo.ingtechbd.com/attendance/getbydatepicker.php";
     String in_time,out_time,remarks,date,name,employee_id,status,totaltime;
-    CheckBox searchybydate;
-
+    CheckBox searchybydate,searchbyid;
+    String empid;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
+        usersList = new ArrayList<Employee>();
         pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
-        String empid = pref.getString("empid",null);
+        empid = pref.getString("empid",null);
 
         listview = (ListView) findViewById(R.id.listview);
         nametext = (TextView) findViewById(R.id.textview);
         searhText = (EditText) findViewById(R.id.searhText);
         searchybydate = (CheckBox) findViewById(R.id.searchbydate);
+        searchbyid = (CheckBox) findViewById(R.id.searchbyempid);
         searhText.setText(empid);
         searhText.setTextIsSelectable(false);
+
+        if(empid!=null) {
+            getname(empid);
+            searchybydate.setEnabled(true);
+            searchbyid.setEnabled(false);
+            //getsearch(value);
+        }
+        if(searhText.length() == 0){
+            usersList.clear();
+            mAdapter = new MyAdapter(usersList, ReportActivity.this);
+            listview.setAdapter(mAdapter);
+        }
+
 
         searchybydate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(searchybydate.isChecked()){
-                    searhText.setText("");
-                    searhText.setFocusableInTouchMode(true);
-                    searhText.requestFocus();
-                    searhText.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+                    searchbyid.setChecked(false);
 
-                            DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(ReportActivity.this,false);
-                            dateRangePickerFragment.show(getSupportFragmentManager(),"datePicker");
-                            //showDialog(DATE_DIALOG_ID);
-                        }
-                    });
+                    DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(ReportActivity.this,false);
+                    dateRangePickerFragment.show(getSupportFragmentManager(),"datePicker");
+
+                    searhText.setText("");
+                    searhText.setHint("pick date");
+                    usersList.clear();
+                    mAdapter = new MyAdapter(usersList, ReportActivity.this);
+                    listview.setAdapter(mAdapter);
                 }
             }
         });
 
-        searhText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
+        searchbyid.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String value = searhText.getText().toString();
-                if(value!=null) {
-                    getname(value);
-                    //getsearch(value);
-                }
-                if(searhText.length() == 0){
+            public void onClick(View view) {
+                if(searchbyid.isChecked()){
+                    searchybydate.setChecked(false);
+                    searhText.setText("");
+                    searhText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    searhText.setHint("employee id");
+                    searhText.setText(empid);
+
+                    usersList.clear();
                     mAdapter = new MyAdapter(usersList, ReportActivity.this);
                     listview.setAdapter(mAdapter);
 
-                    //recyclerView.setAdapter(mAdapter);
-                    //preferences.edit().clear().commit();
+                    searhText.setFocusableInTouchMode(false);
+                    searhText.setClickable(false);
+                    searhText.setFocusable(false);
+                    String emplid = searhText.getText().toString();
+                    getname(emplid);
+                    //Toast.makeText(ReportActivity.this, ""+emplid, Toast.LENGTH_SHORT).show();
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                //HistoryActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-            }
         });
+       // searchybydate.setEnabled(false);
     }
 
     private void getname(final String value) {
@@ -185,15 +197,12 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
                                     status = json.getString("status");
                                     totaltime = json.getString("totaltime");
 
-                                    //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
-                                    //name = preferences.getString("Name", "");
-
-                                    //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
+                                    Log.d("in_time",in_time);
                                     usersList.add(new Employee(name,in_time,out_time,remarks,date,status,totaltime));
-                                    //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
                                     mAdapter = new MyAdapter(usersList, ReportActivity.this);
                                     listview.setAdapter(mAdapter);
+
 
                                     listview.setOnTouchListener(new View.OnTouchListener() {
                                         @Override
@@ -205,8 +214,8 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
                                             return false;
                                         }
                                     });
-                                    //usersList.clear();
                                     mAdapter.notifyDataSetChanged();
+
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -277,6 +286,8 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
 
                                         mAdapter = new MyAdapter(usersList, ReportActivity.this);
                                         listview.setAdapter(mAdapter);
+                                        searchbyid.setEnabled(true);
+
                                         listview.setOnTouchListener(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent event) {

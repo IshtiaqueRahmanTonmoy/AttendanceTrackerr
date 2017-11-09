@@ -274,9 +274,6 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
                 cal1 = Calendar.getInstance();
                 sdf1 = new SimpleDateFormat("hh:mm a");
 
-
-
-
                 try {
                     Date d1 = sdf.parse(intime);
                     //Toast.makeText(AttendanceActivity.this, "date d1"+d1, Toast.LENGTH_SHORT).show();
