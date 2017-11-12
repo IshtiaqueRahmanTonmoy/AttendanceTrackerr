@@ -1,14 +1,19 @@
 package com.ingeniousat.com.attendancetrackerr;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +24,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.Manifest;
+
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -49,9 +56,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-public class AttendanceActivity extends AppCompatActivity implements LocationListener {
+public class AttendanceActivity extends AppCompatActivity {
 
     CheckBox inTime, outTime;
     EditText remarks;
@@ -74,12 +83,18 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
     private LocationManager locationManager;
     private String provider;
     double latitude,longitude;
-
-
+    GPSTracker gps;
+    AppLocationService appLocationService;
+    Button btnGPSShowLocation;
+    Button btnNWShowLocation;
+    String location;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
+
+        dateFormat = new SimpleDateFormat("d/M/yyyy");
+        datetime = new Date();
 
         Intent intent = getIntent();
         employee_id = intent.getExtras().getString("employeeid");
@@ -107,42 +122,12 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
             }
         });
 
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        // Creating an empty criteria object
-        Criteria criteria = new Criteria();
-
-        // Getting the name of the provider that meets the criteria
-        provider = locationManager.getBestProvider(criteria, false);
-
-        if(provider!=null && !provider.equals("")){
-
-            // Get the location from the given provider
-            Location location = locationManager.getLastKnownLocation(provider);
-
-            locationManager.requestLocationUpdates(provider, 20000, 1, this);
-
-            if(location!=null)
-                onLocationChanged(location);
-            else
-                Toast.makeText(getBaseContext(), "Location can't be retrieved", Toast.LENGTH_SHORT).show();
-
-        }else{
-            Toast.makeText(getBaseContext(), "No Provider Found", Toast.LENGTH_SHORT).show();
-        }
 
         inTime.setEnabled(true);
         outTime.setEnabled(false);
 
-        dateFormat = new SimpleDateFormat("d/M/yyyy");
-        datetime = new Date();
-
-
-
         cal = Calendar.getInstance();
         sdf = new SimpleDateFormat("hh:mm a");
-
-
 
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 
@@ -156,6 +141,75 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
         outTime.setChecked(false);
         remarks = (EditText) findViewById(R.id.remarksEdt);
 
+    }
+
+    private void getAddress(double latitude, double longitude) {
+          Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            try {
+                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                Address obj = addresses.get(0);
+                location = obj.getAddressLine(0);
+                Log.d("location",location);
+                location = location + "\n" + obj.getCountryName();
+                location = location + "\n" + obj.getCountryCode();
+                location = location + "\n" + obj.getAdminArea();
+                location = location + "\n" + obj.getPostalCode();
+                location = location + "\n" + obj.getSubAdminArea();
+                location = location + "\n" + obj.getLocality();
+                location = location + "\n" + obj.getSubThoroughfare();
+
+                //Toast.makeText(AttendanceActivity.this, ""+location, Toast.LENGTH_SHORT).show();
+                Log.v("IGA", "Address" + location);
+                // Toast.makeText(this, "Address=>" + add,
+                // Toast.LENGTH_SHORT).show();
+
+                // TennisAppActivity.showDialog(add);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    public void showSettingsAlert(String provider) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                AttendanceActivity.this);
+
+        alertDialog.setTitle(provider + " SETTINGS");
+
+        alertDialog
+                .setMessage(provider + " is not enabled! Want to go to settings menu?");
+
+        alertDialog.setPositiveButton("Settings",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        AttendanceActivity.this.startActivity(intent);
+                    }
+                });
+
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    public static float distFrom(float lat1, float lng1, float lat2, float lng2) {
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2-lat1);
+        double dLng = Math.toRadians(lng2-lng1);
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        float dist = (float) (earthRadius * c);
+
+        return dist;
     }
 
     public Boolean isNetAvailable(Context con) {
@@ -193,6 +247,24 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
     public void OnSubmit(View view) {
 
         if (inTime.isChecked()) {
+
+            gps = new GPSTracker(this);
+
+            // check if GPS enabled
+            if(gps.canGetLocation()){
+
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+
+                getAddress(latitude,longitude);
+                // \n is for new line
+                //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+            }else{
+                // can't get location
+                // GPS or Network is not enabled
+                // Ask user to enable GPS/network in settings
+                gps.showSettingsAlert();
+            }
 
             String t = remarksEdt = remarks.getText().toString();
             date = dateFormat.format(datetime);
@@ -238,6 +310,7 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
                                 inTime.setChecked(false);
                                 inTime.setEnabled(false);
                                 outTime.setEnabled(true);
+                                remarks.setEnabled(false);
                                 // Display the response string.
                                 //_response.setText(response);
                             }
@@ -255,6 +328,12 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
                         params.put("in_time", sdf.format(cal.getTime()));
                         params.put("out_time", "");
                         params.put("date", date);
+
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AttendanceActivity.this);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("date",date);
+                        editor.apply();
+                        params.put("location",location);
                         params.put("status", hourminute);
                         params.put("remarks", remarksEdt);
                         return params;
@@ -383,24 +462,5 @@ public class AttendanceActivity extends AppCompatActivity implements LocationLis
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        Toast.makeText(AttendanceActivity.this, "latitude"+location.getLatitude()+"longitute"+location.getLongitude(), Toast.LENGTH_SHORT).show();
 
-    }
-
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 }

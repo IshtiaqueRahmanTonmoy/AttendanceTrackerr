@@ -87,7 +87,7 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="4dp"
                 android:layout_weight="1"
-                android:background="@color/ColorPrimary"
+                android:background="@color/colorCell"
                 android:tag="facebook_login_button"
                 android:onClick="OnSubmit"
                 android:textColor="@color/textColorPrimary"
@@ -102,11 +102,12 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginBottom="4dp"
                 android:layout_weight="1"
-                android:background="@color/ColorPrimary"
+                android:background="@color/colorCell"
                 android:tag="facebook_login_button"
                 android:onClick="OnReportView"
                 android:textColor="@color/textColorPrimary"
                 android:text="@string/reportview" />
+
         </LinearLayout>
 
     </LinearLayout>
