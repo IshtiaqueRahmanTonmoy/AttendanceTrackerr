@@ -19,6 +19,7 @@
     <string name="forgot">Forgot Password</string>
     <string name="searchbydate">Search</string>
     <string name="event">Add Event Schedule</string>
+    <string name="location">Location</string>
     <string name="but_done">Done</string>
 
     <string name="reportview">View Report</string>

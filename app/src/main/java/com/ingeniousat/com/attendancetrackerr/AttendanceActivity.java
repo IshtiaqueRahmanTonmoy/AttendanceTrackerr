@@ -96,6 +96,28 @@ public class AttendanceActivity extends AppCompatActivity {
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
 
+        cal = Calendar.getInstance();
+        sdf = new SimpleDateFormat("h:mm a");
+
+        gps = new GPSTracker(this);
+
+        // check if GPS enabled
+        if(gps.canGetLocation()){
+
+            double latitude = gps.getLatitude();
+            double longitude = gps.getLongitude();
+
+            getAddress(latitude,longitude);
+            // \n is for new line
+            //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+        }else{
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gps.showSettingsAlert();
+        }
+
+
         Intent intent = getIntent();
         employee_id = intent.getExtras().getString("employeeid");
 
@@ -108,8 +130,8 @@ public class AttendanceActivity extends AppCompatActivity {
         event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                  Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
-                  startActivity(intent);
+                Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -126,9 +148,6 @@ public class AttendanceActivity extends AppCompatActivity {
         inTime.setEnabled(true);
         outTime.setEnabled(false);
 
-        cal = Calendar.getInstance();
-        sdf = new SimpleDateFormat("hh:mm a");
-
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 
         pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
@@ -144,32 +163,32 @@ public class AttendanceActivity extends AppCompatActivity {
     }
 
     private void getAddress(double latitude, double longitude) {
-          Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            try {
-                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                Address obj = addresses.get(0);
-                location = obj.getAddressLine(0);
-                Log.d("location",location);
-                location = location + "\n" + obj.getCountryName();
-                location = location + "\n" + obj.getCountryCode();
-                location = location + "\n" + obj.getAdminArea();
-                location = location + "\n" + obj.getPostalCode();
-                location = location + "\n" + obj.getSubAdminArea();
-                location = location + "\n" + obj.getLocality();
-                location = location + "\n" + obj.getSubThoroughfare();
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            Address obj = addresses.get(0);
+            location = obj.getAddressLine(0);
+            Log.d("location",location);
+            location = location + "\n" + obj.getCountryName();
+            location = location + "\n" + obj.getCountryCode();
+            location = location + "\n" + obj.getAdminArea();
+            location = location + "\n" + obj.getPostalCode();
+            location = location + "\n" + obj.getSubAdminArea();
+            location = location + "\n" + obj.getLocality();
+            location = location + "\n" + obj.getSubThoroughfare();
 
-                //Toast.makeText(AttendanceActivity.this, ""+location, Toast.LENGTH_SHORT).show();
-                Log.v("IGA", "Address" + location);
-                // Toast.makeText(this, "Address=>" + add,
-                // Toast.LENGTH_SHORT).show();
+            //Toast.makeText(AttendanceActivity.this, ""+location, Toast.LENGTH_SHORT).show();
+            Log.v("IGA", "Address" + location);
+            // Toast.makeText(this, "Address=>" + add,
+            // Toast.LENGTH_SHORT).show();
 
-                // TennisAppActivity.showDialog(add);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            // TennisAppActivity.showDialog(add);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
 
     public void showSettingsAlert(String provider) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(
@@ -248,23 +267,30 @@ public class AttendanceActivity extends AppCompatActivity {
 
         if (inTime.isChecked()) {
 
-            gps = new GPSTracker(this);
+            SimpleDateFormat simpleDateFormats = new SimpleDateFormat("HH:mm");
+            Date startDate = null;
+            Date endDate = null;
 
-            // check if GPS enabled
-            if(gps.canGetLocation()){
-
-                double latitude = gps.getLatitude();
-                double longitude = gps.getLongitude();
-
-                getAddress(latitude,longitude);
-                // \n is for new line
-                //Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
-            }else{
-                // can't get location
-                // GPS or Network is not enabled
-                // Ask user to enable GPS/network in settings
-                gps.showSettingsAlert();
+            Date dt = new Date();
+            int hm = dt.getHours();
+            int mm = dt.getMinutes();
+            String time = ""+hm+":"+mm;
+            try {
+                startDate = simpleDateFormats.parse(time);
+                //Toast.makeText(AttendanceActivity.this, ""+startDate, Toast.LENGTH_SHORT).show();
+                Log.d("startDate", String.valueOf(startDate));
+                endDate = simpleDateFormats.parse("10:30");
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
+
+            long difference = endDate.getTime() - startDate.getTime();
+            int days = (int) (difference / (1000*60*60*24));
+            int hours = (int) ((difference - (1000*60*60*24*days)) / (1000*60*60));
+            int min = (int) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
+            hourminute = ""+hours+":"+min;
+            Log.i("log_tag","Hours: "+hours+", Mins: "+min);
+
 
             String t = remarksEdt = remarks.getText().toString();
             date = dateFormat.format(datetime);
@@ -276,143 +302,129 @@ public class AttendanceActivity extends AppCompatActivity {
             edt.putString("intime",sdf.format(cal.getTime()));
             edt.commit();
 
+
+            RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
+            //this is the url where you want to send the request
+            //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
+
+            String url = "http://demo.ingtechbd.com/attendance/insert.php";
+
+            // Request a string response from the provided URL.
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("response", response);
+                            Toast.makeText(AttendanceActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
+                            inTime.setChecked(false);
+                            inTime.setEnabled(false);
+                            outTime.setEnabled(true);
+                            remarks.setEnabled(false);
+                            // Display the response string.
+                            //_response.setText(response);
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //_response.setText("That didn't work!");
+                }
+            }) {
+                //adding parameters to the request
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("employee_id", employee_id);
+                    params.put("in_time", sdf.format(cal.getTime()));
+                    params.put("out_time", "");
+                    params.put("date", date);
+                    params.put("location",location);
+                    params.put("status",hourminute);
+                    params.put("remarks", remarksEdt);
+
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AttendanceActivity.this);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("date",date);
+                    editor.apply();
+
+                    Log.d("params",params.toString());
+                    return params;
+                }
+            };
+            // Add the request to the RequestQueue.
+            queue.add(stringRequest);
+        }
+
+        if (outTime.isChecked() && !inTime.isEnabled()) {
+
+            date = dateFormat.format(datetime);
+            pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+            String intime = pref.getString("intime",null);
+            //Toast.makeText(AttendanceActivity.this, ""+intime, Toast.LENGTH_SHORT).show();
+
+            cal1 = Calendar.getInstance();
+            sdf1 = new SimpleDateFormat("hh:mm a");
+
             try {
-                Date d1 = sdf.parse(sdf.format(cal.getTime()));
-                Date d2 = sdf.parse("10:30 AM");
+                Date d1 = sdf.parse(intime);
+                //Toast.makeText(AttendanceActivity.this, "date d1"+d1, Toast.LENGTH_SHORT).show();
+                Date d2 = sdf.parse(sdf1.format(cal1.getTime()));
                 Log.d("intime", String.valueOf(d1));
                 Log.d("outtime", String.valueOf(d2));
                 diff = d2.getTime() - d1.getTime();
+                Log.d("differenece", String.valueOf(diff));
+                //Toast.makeText(AttendanceActivity.this, ""+diff, Toast.LENGTH_SHORT).show();
                 diffHours = Math.abs(diff / (60 * 60 * 1000) % 24);
                 diffMinutes = Math.abs(diff/(60 * 1000) % 60);
-                hour = String.valueOf(diffHours);
-                minute = String.valueOf(diffMinutes);
-                hourminute = ""+hour+":"+minute+"";
-                //Log.d("hourminute",hourminute);
-                //Toast.makeText(AttendanceActivity.this, ""+hourminute, Toast.LENGTH_SHORT).show();
-                //Toast.makeText(AttendanceActivity.this, ""+diffHours+""+diffMinutes, Toast.LENGTH_SHORT).show();
+                hours = String.valueOf(diffHours);
+                minutes = String.valueOf(diffMinutes);
+                hourmintues = ""+diffHours+"Hour"+":"+""+diffMinutes+""+"Minute";
+                Log.d("totaltimeofhourandime",hourmintues);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            RequestQueue queue = Volley.newRequestQueue(AttendanceActivity.this);
-                //this is the url where you want to send the request
-                //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
+            RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
+            //this is the url where you want to send the request
+            //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
 
-                String url = "http://demo.ingtechbd.com/attendance/insert.php";
+            String url = "http://demo.ingtechbd.com/attendance/update.php";
 
-                // Request a string response from the provided URL.
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.d("response", response);
-                                Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
-                                inTime.setChecked(false);
-                                inTime.setEnabled(false);
-                                outTime.setEnabled(true);
-                                remarks.setEnabled(false);
-                                // Display the response string.
-                                //_response.setText(response);
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //_response.setText("That didn't work!");
-                    }
-                }) {
-                    //adding parameters to the request
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("employee_id", employee_id);
-                        params.put("in_time", sdf.format(cal.getTime()));
-                        params.put("out_time", "");
-                        params.put("date", date);
-
-                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AttendanceActivity.this);
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("date",date);
-                        editor.apply();
-                        params.put("location",location);
-                        params.put("status", hourminute);
-                        params.put("remarks", remarksEdt);
-                        return params;
-                    }
-                };
-                // Add the request to the RequestQueue.
-                queue.add(stringRequest);
-            }
-
-            if (outTime.isChecked() && !inTime.isEnabled()) {
-
-                date = dateFormat.format(datetime);
-                pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
-                String intime = pref.getString("intime",null);
-                //Toast.makeText(AttendanceActivity.this, ""+intime, Toast.LENGTH_SHORT).show();
-
-                cal1 = Calendar.getInstance();
-                sdf1 = new SimpleDateFormat("hh:mm a");
-
-                try {
-                    Date d1 = sdf.parse(intime);
-                    //Toast.makeText(AttendanceActivity.this, "date d1"+d1, Toast.LENGTH_SHORT).show();
-                    Date d2 = sdf.parse(sdf1.format(cal1.getTime()));
-                    Log.d("intime", String.valueOf(d1));
-                    Log.d("outtime", String.valueOf(d2));
-                    diff = d2.getTime() - d1.getTime();
-                    Log.d("differenece", String.valueOf(diff));
-                    //Toast.makeText(AttendanceActivity.this, ""+diff, Toast.LENGTH_SHORT).show();
-                    diffHours = Math.abs(diff / (60 * 60 * 1000) % 24);
-                    diffMinutes = Math.abs(diff/(60 * 1000) % 60);
-                    hours = String.valueOf(diffHours);
-                    minutes = String.valueOf(diffMinutes);
-                    hourmintues = ""+diffHours+"Hour"+":"+""+diffMinutes+""+"Minute";
-                    Log.d("totaltimeofhourandime",hourmintues);
-                } catch (ParseException e) {
-                    e.printStackTrace();
+            // Request a string response from the provided URL.
+            StringRequest stringRequests = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.d("response", response);
+                            outTime.setEnabled(false);
+                            remarks.setText("");
+                            submit.setEnabled(false);
+                            Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //_response.setText("That didn't work!");
                 }
+            }) {
+                //adding parameters to the request
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    //Log.d("allresultvalue",sdf1.format(cal1.getTime())+hourmintues+employee_id+date);
+                    params.put("out_time", sdf1.format(cal1.getTime()));
+                    params.put("totaltime", hourmintues);
+                    params.put("employee_id", employee_id);
+                    params.put("date", date);
+                    Log.d("params",params.toString());
+                    return params;
+                }
+            };
+            // Add the request to the RequestQueue.
+            queues.add(stringRequests);
 
-                RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
-                //this is the url where you want to send the request
-                //TODO: replace with your own url to send request, as I am using my own localhost for this tutorial
-
-                String url = "http://demo.ingtechbd.com/attendance/update.php";
-
-                // Request a string response from the provided URL.
-                StringRequest stringRequests = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.d("response", response);
-                                outTime.setEnabled(false);
-                                remarks.setText("");
-                                submit.setEnabled(false);
-                                Toast.makeText(AttendanceActivity.this, "out time registered", Toast.LENGTH_SHORT).show();
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //_response.setText("That didn't work!");
-                    }
-                }) {
-                    //adding parameters to the request
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<>();
-                        //Log.d("allresultvalue",sdf1.format(cal1.getTime())+hourmintues+employee_id+date);
-                        params.put("out_time", sdf1.format(cal1.getTime()));
-                        params.put("totaltime", hourmintues);
-                        params.put("employee_id", employee_id);
-                        params.put("date", date);
-                        Log.d("params",params.toString());
-                        return params;
-                    }
-                };
-                // Add the request to the RequestQueue.
-                queues.add(stringRequests);
-
-            }
-       }
+        }
+    }
 
     private String getWifiName(Context context) {
 
@@ -435,23 +447,23 @@ public class AttendanceActivity extends AppCompatActivity {
         RequestQueue queues = Volley.newRequestQueue(AttendanceActivity.this);
         String uri = String.format("http://demo.ingtechbd.com/attendance/getvalue.php?email="+email);
         StringRequest stringRequests = new StringRequest(Request.Method.GET, uri,new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject rsp = new JSONObject(response);
-                            JSONArray array = rsp.getJSONArray("result");
-                            for (int i = 0; i < array.length(); i++) {
-                                JSONObject users = array.getJSONObject(i);
-                                employee_id = users.getString("employee_id");
-                                //Toast.makeText(AttendanceActivity.this, ""+emplo, Toast.LENGTH_SHORT).show();
-                            }
-                            // do your work with response object
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject rsp = new JSONObject(response);
+                    JSONArray array = rsp.getJSONArray("result");
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject users = array.getJSONObject(i);
+                        employee_id = users.getString("employee_id");
+                        //Toast.makeText(AttendanceActivity.this, ""+emplo, Toast.LENGTH_SHORT).show();
                     }
-                }, new Response.ErrorListener() {
+                    // do your work with response object
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 //_response.setText("That didn't work!");

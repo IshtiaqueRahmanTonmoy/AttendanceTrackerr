@@ -15,20 +15,33 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/searhText"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:maxLines="1"
-        android:hint="search by employee id"
-        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <EditText
+            android:id="@+id/searhText"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLines="1"
+            android:hint="search by "
+            />
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="Search" />
+
+    </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <!--
             <CheckBox
                 android:id="@+id/searchbyempid"
                 android:layout_width="wrap_content"
@@ -41,6 +54,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="search by date"/>
+                -->
+
+            <RadioGroup
+                android:id="@+id/rgOpinion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+                <RadioButton
+                    android:id="@+id/searchbyempid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Search by employee id">
+                </RadioButton>
+                <RadioButton
+                    android:id="@+id/searchbydate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Search by date">
+                </RadioButton>
+
+            </RadioGroup>
 
         </LinearLayout>
     </LinearLayout>
@@ -99,6 +135,15 @@
             android:gravity = "center"
             android:padding = "5dp"
             android:text = "@string/date"
+            android:textColor = "#ffffff" />
+
+        <TextView
+            android:layout_width = "0dp"
+            android:layout_height = "wrap_content"
+            android:layout_weight = "1"
+            android:gravity = "center"
+            android:padding = "5dp"
+            android:text = "@string/location"
             android:textColor = "#ffffff" />
 
         <TextView

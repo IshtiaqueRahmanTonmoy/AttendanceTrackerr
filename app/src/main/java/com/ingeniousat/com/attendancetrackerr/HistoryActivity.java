@@ -2,6 +2,7 @@ package com.ingeniousat.com.attendancetrackerr;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -15,15 +16,19 @@ import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,8 +48,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.StringTokenizer;
 
-public class HistoryActivity extends AppCompatActivity  implements DateRangePickerFragment.OnDateRangeSelectedListener{
+public class HistoryActivity extends AppCompatActivity  implements DateRangePickerFragment.OnDateRangeSelectedListener,View.OnClickListener{
 
     TextView nametext;
     EditText searchview;
@@ -54,7 +60,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
     public static final String GETDATE_URL = "http://demo.ingtechbd.com/attendance/getnamebydate.php";
     public static final String GETDATEPICKER_URL = "http://demo.ingtechbd.com/attendance/getbydatepicker.php";
     public static final String GETNAME_URL = "http://demo.ingtechbd.com/attendance/getname.php";
-    String in_time,out_time,remarks,date,name,employee_id,status,totaltime;
+    String in_time,out_time,remarks,date,name,employee_id,status,totaltime,location;
     private ArrayList<Employee> usersList;
     RecyclerView recyclerView;
     MyAdapter mAdapter;
@@ -63,8 +69,10 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
     private int mDay;
     static final int DATE_DIALOG_ID = 0;
     CheckBox searchbydate,searchybyid;
-    Button searchdate;
-
+    Button searchdate,search;
+    RadioGroup radioGroup;
+    private RadioButton radioButton;
+    private ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +83,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
         nametext = (TextView) findViewById(R.id.textview);
         listview = (ListView) findViewById(R.id.listview);
+        search = (Button) findViewById(R.id.searchButton);
 
         final Calendar c = Calendar.getInstance();
         mYear = c.get(Calendar.YEAR);
@@ -83,14 +92,61 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
         searchview = (EditText) findViewById(R.id.searhText);
         searchview.setFocusable(false);
-        searchbydate = (CheckBox) findViewById(R.id.searchbyempid);
-        searchybyid = (CheckBox) findViewById(R.id.searchbydate);
+        searchview.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                searchview.setFocusableInTouchMode(true);
+                searchview.requestFocus();
+                return false;
+            }
+        });
 
+        radioGroup = (RadioGroup) findViewById(R.id.rgOpinion);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                switch (checkedId) {
+                    case R.id.searchbyempid:
+                        searchview.setText("");
+                        usersList.clear();
+                        mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
+                        listview.setAdapter(mAdapter);
+                        searchview.setFocusableInTouchMode(true);
+                        searchview.requestFocus();
+                        //Toast.makeText(getApplicationContext(), "id", Toast.LENGTH_LONG).show();
+                        break;
+                    case R.id.searchbydate:
+                        searchview.setText("");
+                        usersList.clear();
+                        mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
+                        listview.setAdapter(mAdapter);
+                        searchview.setFocusableInTouchMode(true);
+                        searchview.requestFocus();
+                        DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(HistoryActivity.this,false);
+                        dateRangePickerFragment.show(getSupportFragmentManager(),"datePicker");
+
+                        //Toast.makeText(getApplicationContext(), "date", Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+        });
+
+
+        searchview.setOnClickListener(this);
+        search.setOnClickListener(this);
+
+        //searchbydate = (CheckBox) findViewById(R.id.searchbyempid);
+        //searchybyid = (CheckBox) findViewById(R.id.searchbydate);
+
+
+
+        /*
         searchbydate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(searchbydate.isChecked()){
                     searchview.setText("");
+                    searchview.setHint("search by id");
                     searchybyid.setChecked(false);
                     searchview.setFocusableInTouchMode(true);
                     searchview.requestFocus();
@@ -104,7 +160,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                             }
                             if(searchview.length() == 0){
                                 usersList.clear();
-                                mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
                                 listview.setAdapter(mAdapter);
                             }
                         }
@@ -118,6 +174,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
             public void onClick(View view) {
                 if(searchybyid.isChecked()){
                     searchview.setText("");
+                    searchview.setHint("search by date");
                     searchbydate.setChecked(false);
                     searchview.setFocusableInTouchMode(true);
                     searchview.requestFocus();
@@ -133,6 +190,9 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 }
             }
         });
+        */
+
+        /*
         searchview.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -148,7 +208,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 }
                 if(searchview.length() == 0){
                     usersList.clear();
-                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                    mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
                     listview.setAdapter(mAdapter);
 
                     //recyclerView.setAdapter(mAdapter);
@@ -161,6 +221,8 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                 //HistoryActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             }
         });
+        */
+
     }
 
     private DatePickerDialog.OnDateSetListener mDateSetListener =
@@ -218,14 +280,17 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                         out_time = json.getString("out_time");
                                         remarks = json.getString("remarks");
                                         date = json.getString("date");
+                                        location = json.getString("location");
                                         status = json.getString("status");
                                         totaltime = json.getString("totaltime");
 
-                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, status, totaltime));
+                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, location, status, totaltime));
                                         //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                        mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                        mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
                                         listview.setAdapter(mAdapter);
+
+
                                         listview.setOnTouchListener(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent event) {
@@ -236,7 +301,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                                 return false;
                                             }
                                         });
-                                        //usersList.clear();
+
                                         mAdapter.notifyDataSetChanged();
 
                                     } catch (JSONException e) {
@@ -353,6 +418,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                     out_time = json.getString("out_time");
                                     remarks = json.getString("remarks");
                                     date = json.getString("date");
+                                    location = json.getString("location");
                                     status = json.getString("status");
                                     totaltime = json.getString("totaltime");
 
@@ -360,11 +426,12 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                     //name = preferences.getString("Name", "");
 
                                     //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
-                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,status,totaltime));
+                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,location,status,totaltime));
                                     //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                    mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                    mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
                                     listview.setAdapter(mAdapter);
+                                    progressDialog.dismiss();
 
                                     listview.setOnTouchListener(new View.OnTouchListener() {
                                         @Override
@@ -400,6 +467,9 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
         RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
         requestQueue.add(stringRequest);
+        progressDialog = new ProgressDialog(HistoryActivity.this);
+        progressDialog.setMessage("Fetching data....");
+        progressDialog.show();
     }
 
     @Override
@@ -411,6 +481,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
         searchview.setText(firstdate+"-"+lastdate);
 
+        /*
         //Toast.makeText(HistoryActivity.this, ""+datevalue, Toast.LENGTH_SHORT).show();
         Uri.Builder builder = Uri.parse(GETDATEPICKER_URL).buildUpon();
         builder.appendQueryParameter("firstdate",firstdate);
@@ -440,13 +511,14 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                         out_time = json.getString("out_time");
                                         remarks = json.getString("remarks");
                                         date = json.getString("date");
+                                        location = json.getString("location");
                                         status = json.getString("status");
                                         totaltime = json.getString("totaltime");
 
-                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, status, totaltime));
+                                        usersList.add(new Employee(name, in_time, out_time, remarks, date,location, status, totaltime));
                                         //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                        mAdapter = new MyAdapter(usersList, HistoryActivity.this);
+                                        mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
                                         listview.setAdapter(mAdapter);
                                         listview.setOnTouchListener(new View.OnTouchListener() {
                                             @Override
@@ -456,6 +528,17 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                                 imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
 
                                                 return false;
+                                            }
+                                        });
+
+                                        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                                                //String selectedSweet = listview.getItemAtPosition(position).toString();
+
+                                                TextView textView = (TextView) view.findViewById(R.id.locationValue);
+                                                String text = textView.getText().toString();
+                                                Toast.makeText(getApplicationContext(), "Selected item: " + text , Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                         //usersList.clear();
@@ -487,6 +570,143 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
         RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
         requestQueue.add(stringRequest);
+        */
+    }
+
+    @Override
+    public void onClick(View view) {
+
+        if (view == search) {
+            int selectedId = radioGroup.getCheckedRadioButtonId();
+
+            // find the radiobutton by returned id
+            radioButton = (RadioButton) findViewById(selectedId);
+
+            //Toast.makeText(HistoryActivity.this,
+            //        radioButton.getText(), Toast.LENGTH_SHORT).show();
+            if(radioButton.getText().equals("Search by employee id")){
+                String value = searchview.getText().toString();
+                if(value!=null) {
+                    getname(value);
+                    //getsearch(value);
+                }
+                if(searchview.length() == 0){
+                    usersList.clear();
+                    mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
+                    listview.setAdapter(mAdapter);
+                }
+            }
+            else if(radioButton.getText().equals("Search by date")){
+                 String text = searchview.getText().toString();
+                 StringTokenizer st = new StringTokenizer(text, "-");
+                 String firstdate = st.nextToken();
+                 String lastdate = st.nextToken();
+                 getvalue(firstdate,lastdate);
+
+                 //Toast.makeText(HistoryActivity.this, "firstdate"+firstdate+"secondate"+secondate, Toast.LENGTH_SHORT).show();
+                 //DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(HistoryActivity.this,false);
+                //dateRangePickerFragment.show(getSupportFragmentManager(),"datePicker");
+            }
+
+        }
+
+            //Log.d("opinion",opinion);
+            //Toast.makeText(this, "Your Opinion is : " + opinion, Toast.LENGTH_LONG).show(); }
+     }
+
+    private void getvalue(String firstdate, String lastdate) {
+        Uri.Builder builder = Uri.parse(GETDATEPICKER_URL).buildUpon();
+        builder.appendQueryParameter("firstdate",firstdate);
+        builder.appendQueryParameter("lastdate",lastdate);
+        String loginUrl=builder.build().toString();
+        Log.d("loginurl",loginUrl);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("response", response.toString());
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray j = jsonObject.getJSONArray("result");
+                            //Toast.makeText(HistoryActivity.this, "length"+j.length(), Toast.LENGTH_SHORT).show();
+                            if (j != null && j.length() > 0){
+
+                                for (int i = 0; i < j.length(); i++) {
+                                    try {
+                                        //Getting json object
+                                        JSONObject json = j.getJSONObject(i);
+                                        Log.d("json", json.toString());
+                                        name = json.getString("name");
+                                        //Toast.makeText(HistoryActivity.this, ""+name, Toast.LENGTH_SHORT).show();
+                                        in_time = json.getString("in_time");
+                                        out_time = json.getString("out_time");
+                                        remarks = json.getString("remarks");
+                                        date = json.getString("date");
+                                        location = json.getString("location");
+                                        status = json.getString("status");
+                                        totaltime = json.getString("totaltime");
+
+                                        usersList.add(new Employee(name, in_time, out_time, remarks, date,location, status, totaltime));
+                                        //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
+
+                                        mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
+                                        listview.setAdapter(mAdapter);
+                                        progressDialog.dismiss();
+
+                                        listview.setOnTouchListener(new View.OnTouchListener() {
+                                            @Override
+                                            public boolean onTouch(View v, MotionEvent event) {
+
+                                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+
+                                                return false;
+                                            }
+                                        });
+
+                                        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                                                //String selectedSweet = listview.getItemAtPosition(position).toString();
+
+                                                TextView textView = (TextView) view.findViewById(R.id.locationValue);
+                                                String text = textView.getText().toString();
+                                                Toast.makeText(getApplicationContext(), "Selected item: " + text , Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        //usersList.clear();
+                                        mAdapter.notifyDataSetChanged();
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                            else{
+                                Toast.makeText(HistoryActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("response",response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("error", String.valueOf(error));
+                        //You can handle error here if you want
+                    }
+                }){
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(HistoryActivity.this);
+        requestQueue.add(stringRequest);
+        progressDialog = new ProgressDialog(HistoryActivity.this);
+        progressDialog.setMessage("Fetching data....");
+        progressDialog.show();
     }
 }
 

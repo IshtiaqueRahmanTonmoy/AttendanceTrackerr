@@ -42,7 +42,7 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
     public static final String GETNAME_URL = "http://demo.ingtechbd.com/attendance/getname.php";
     public static final String GETINFO_URL = "http://demo.ingtechbd.com/attendance/getemphistory.php";
     public static final String GETDATEPICKER_URL = "http://demo.ingtechbd.com/attendance/getbydatepicker.php";
-    String in_time,out_time,remarks,date,name,employee_id,status,totaltime;
+    String in_time,out_time,remarks,date,name,employee_id,location,status,totaltime;
     CheckBox searchybydate,searchbyid;
     String empid;
     @Override
@@ -70,7 +70,7 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
         }
         if(searhText.length() == 0){
             usersList.clear();
-            mAdapter = new MyAdapter(usersList, ReportActivity.this);
+            mAdapter = new MyAdapter(ReportActivity.this,R.layout.activity_history,usersList);
             listview.setAdapter(mAdapter);
         }
 
@@ -87,7 +87,7 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
                     searhText.setText("");
                     searhText.setHint("pick date");
                     usersList.clear();
-                    mAdapter = new MyAdapter(usersList, ReportActivity.this);
+                    mAdapter = new MyAdapter(ReportActivity.this,R.layout.activity_history,usersList);
                     listview.setAdapter(mAdapter);
                 }
             }
@@ -105,7 +105,7 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
                     searhText.setText(empid);
 
                     usersList.clear();
-                    mAdapter = new MyAdapter(usersList, ReportActivity.this);
+                    mAdapter = new MyAdapter(ReportActivity.this,R.layout.activity_history,usersList);
                     listview.setAdapter(mAdapter);
 
                     searhText.setFocusableInTouchMode(false);
@@ -194,13 +194,14 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
                                     out_time = json.getString("out_time");
                                     remarks = json.getString("remarks");
                                     date = json.getString("date");
+                                    location = json.getString("location");
                                     status = json.getString("status");
                                     totaltime = json.getString("totaltime");
 
                                     Log.d("in_time",in_time);
-                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,status,totaltime));
+                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,location,status,totaltime));
 
-                                    mAdapter = new MyAdapter(usersList, ReportActivity.this);
+                                    mAdapter = new MyAdapter(ReportActivity.this,R.layout.activity_history,usersList);
                                     listview.setAdapter(mAdapter);
 
 
@@ -278,13 +279,14 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
                                         out_time = json.getString("out_time");
                                         remarks = json.getString("remarks");
                                         date = json.getString("date");
+                                        location = json.getString("location");
                                         status = json.getString("status");
                                         totaltime = json.getString("totaltime");
 
-                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, status, totaltime));
+                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, location,status, totaltime));
                                         //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                        mAdapter = new MyAdapter(usersList, ReportActivity.this);
+                                        mAdapter = new MyAdapter(ReportActivity.this,R.layout.activity_history,usersList);
                                         listview.setAdapter(mAdapter);
                                         searchbyid.setEnabled(true);
 
