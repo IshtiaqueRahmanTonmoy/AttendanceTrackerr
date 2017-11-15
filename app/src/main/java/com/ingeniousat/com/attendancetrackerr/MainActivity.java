@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
+
+                                //Toast.makeText(MainActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                                Log.d("response",response);
                                 if(response.equals("Connected successfully<br>{\"success\":0,\"message\":\"Oops! An error occurred.\"}")){
                                     Toast.makeText(MainActivity.this, "Please enter correct information..", Toast.LENGTH_SHORT).show();
                                 }
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> params = new HashMap<>();
 
-                        params.put("email", employee_id);
+                        params.put("employee_id", employee_id);
                         params.put("password",password);
 
                         return params;

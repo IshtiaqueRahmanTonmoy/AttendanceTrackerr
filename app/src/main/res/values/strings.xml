@@ -9,7 +9,7 @@
     <string name="workinghour">9</string>
     <string name="whour">Working hour</string>
     <string name="submit">Submit</string>
-
+    <string name="gender">Gender</string>
     <string name="name">Name</string>
     <string name="email">E-mail</string>
     <string name="designation">Designation</string>
@@ -21,6 +21,7 @@
     <string name="event">Add Event Schedule</string>
     <string name="location">Location</string>
     <string name="but_done">Done</string>
+    <string name="address">Address</string>
 
     <string name="reportview">View Report</string>
     <string name="action_settings">Settings</string>
