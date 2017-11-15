@@ -75,7 +75,7 @@ public class AttendanceActivity extends AppCompatActivity {
     String employeeid;
     String urlvalue = "http://demo.ingtechbd.com/attendance/getvalue.php";
     long diff, diffMinutes, diffHours;
-    SharedPreferences pref;
+    SharedPreferences pref,prefs;
     SharedPreferences.Editor edt;
     String currentdate;
     WifiManager wifiManager;
@@ -87,7 +87,10 @@ public class AttendanceActivity extends AppCompatActivity {
     AppLocationService appLocationService;
     Button btnGPSShowLocation;
     Button btnNWShowLocation;
-    String location;
+    String location,dateget;
+    private StringRequest stringRequest;
+    SharedPreferences sharedpreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +98,39 @@ public class AttendanceActivity extends AppCompatActivity {
 
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
+
+        inTime = (CheckBox) findViewById(R.id.checkBox1);
+        outTime = (CheckBox) findViewById(R.id.checkBox2);
+
+        outTime.setEnabled(false);
+
+        submit = (Button)findViewById(R.id.login_button);
+        event = (Button) findViewById(R.id.eventSceduleView);
+        report = (Button)findViewById(R.id.reportView);
+
+        final String currentdate = dateFormat.format(datetime);
+        getlastdate(new VolleyCallback(){
+            @Override
+            public void onSuccess(String result){
+                //Toast.makeText(AttendanceActivity.this, ""+dateget, Toast.LENGTH_SHORT).show();
+
+                Log.d("dateget",dateget);
+                Log.d("currentdate",currentdate);
+
+                if(!dateget.equals(currentdate)){
+                      inTime.setEnabled(true);
+                      outTime.setEnabled(false);
+                }
+                else{
+                }
+
+            }
+        });
+
+
+
+        //Log.d("getthevalue",dateget);
+        //Log.d("currentdate",currentdate);
 
         cal = Calendar.getInstance();
         sdf = new SimpleDateFormat("h:mm a");
@@ -121,11 +157,7 @@ public class AttendanceActivity extends AppCompatActivity {
         Intent intent = getIntent();
         employee_id = intent.getExtras().getString("employeeid");
 
-        inTime = (CheckBox) findViewById(R.id.checkBox1);
-        outTime = (CheckBox) findViewById(R.id.checkBox2);
-        submit = (Button)findViewById(R.id.login_button);
-        event = (Button) findViewById(R.id.eventSceduleView);
-        report = (Button)findViewById(R.id.reportView);
+
 
         event.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,8 +177,8 @@ public class AttendanceActivity extends AppCompatActivity {
         });
 
 
-        inTime.setEnabled(true);
-        outTime.setEnabled(false);
+        //inTime.setEnabled(true);
+        //outTime.setEnabled(false);
 
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 
@@ -157,8 +189,59 @@ public class AttendanceActivity extends AppCompatActivity {
             outTime.setEnabled(true);
         }
 
-        outTime.setChecked(false);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int val = preferences.getInt("getouttimevalue", 0);
+        if(val == 3)
+        {
+            inTime.setEnabled(false);
+            outTime.setEnabled(false);
+        }
+        //outTime.setChecked(false);
         remarks = (EditText) findViewById(R.id.remarksEdt);
+
+    }
+
+
+
+    private void getlastdate(final VolleyCallback callback) {
+        stringRequest = new StringRequest("http://demo.ingtechbd.com/attendance/getlastdate.php",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray j = jsonObject.getJSONArray("result");
+                            for(int i=0;i<j.length();i++){
+                                try {
+                                    //Getting json object
+                                    JSONObject json = j.getJSONObject(i);
+                                    dateget = json.getString("date");
+                                    callback.onSuccess(dateget);
+
+                                    //Toast.makeText(AttendanceActivity.this, "dateget"+dateget, Toast.LENGTH_SHORT).show();
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("response",response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(AttendanceActivity.this,error.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(AttendanceActivity.this);
+        requestQueue.add(stringRequest);
+
 
     }
 
@@ -357,6 +440,11 @@ public class AttendanceActivity extends AppCompatActivity {
 
         if (outTime.isChecked() && !inTime.isEnabled()) {
 
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt("getouttimevalue",3);
+            editor.apply();
+
             date = dateFormat.format(datetime);
             pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
             String intime = pref.getString("intime",null);
@@ -426,21 +514,6 @@ public class AttendanceActivity extends AppCompatActivity {
         }
     }
 
-    private String getWifiName(Context context) {
-
-        WifiManager manager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (manager.isWifiEnabled()) {
-            WifiInfo wifiInfo = manager.getConnectionInfo();
-            if (wifiInfo != null) {
-                NetworkInfo.DetailedState state = WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState());
-                if (state == NetworkInfo.DetailedState.CONNECTED || state == NetworkInfo.DetailedState.OBTAINING_IPADDR) {
-                    return wifiInfo.getSSID();
-                }
-            }
-        }
-        return null;
-
-    }
 
     private void getValue(final String email) {
 
