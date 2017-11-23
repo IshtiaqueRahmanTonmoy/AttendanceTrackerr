@@ -27,6 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
+        android:textColor="@color/white"
+        android:background="@drawable/button_shapeevent"
         android:id="@+id/saveButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true" />

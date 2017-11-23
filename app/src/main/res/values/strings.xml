@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">AttendanceTracker</string>
 
-    <string name="in">In Time</string>
-    <string name="out">Out Time</string>
+    <string name="in">In</string>
+    <string name="out">Out</string>
     <string name="remarks">Remarks</string>
     <string name="date">Date</string>
     <string name="status">Status</string>
@@ -15,7 +15,7 @@
     <string name="designation">Designation</string>
     <string name="employeeid">Employee id</string>
     <string name="password">Password</string>
-    <string name="signin">Sign In</string>
+    <string name="signin">Add Employee</string>
     <string name="forgot">Forgot Password</string>
     <string name="searchbydate">Search</string>
     <string name="event">Add Event Schedule</string>
@@ -31,4 +31,17 @@
     <string name="ttile_tab_end_date">End Date</string>
 
 
+    <style name="DefaultButtonText">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">#979797</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:shadowColor">#f9f9f9</item>
+        <item name="android:shadowDx">1</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">1</item>
+    </style>
 </resources>

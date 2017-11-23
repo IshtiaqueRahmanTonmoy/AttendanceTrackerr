@@ -408,47 +408,55 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray j = jsonObject.getJSONArray("result");
                             //Toast.makeText(HistoryActivity.this, "empid"+value, Toast.LENGTH_SHORT).show();
-                            for(int i=0;i<j.length();i++){
 
-                                //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
-                                try {
-                                    //Getting json object
-                                    JSONObject json = j.getJSONObject(i);
-                                    in_time = json.getString("in_time");
-                                    out_time = json.getString("out_time");
-                                    remarks = json.getString("remarks");
-                                    date = json.getString("date");
-                                    location = json.getString("location");
-                                    status = json.getString("status");
-                                    totaltime = json.getString("totaltime");
+                            if (j != null && j.length() > 0) {
+                                for (int i = 0; i < j.length(); i++) {
 
-                                    //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
-                                    //name = preferences.getString("Name", "");
-
-                                    //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
-                                    usersList.add(new Employee(name,in_time,out_time,remarks,date,location,status,totaltime));
                                     //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
+                                    try {
+                                        //Getting json object
+                                        JSONObject json = j.getJSONObject(i);
+                                        in_time = json.getString("in_time");
+                                        out_time = json.getString("out_time");
+                                        remarks = json.getString("remarks");
+                                        date = json.getString("date");
+                                        location = json.getString("location");
+                                        status = json.getString("status");
+                                        totaltime = json.getString("totaltime");
 
-                                    mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
-                                    listview.setAdapter(mAdapter);
-                                    progressDialog.dismiss();
+                                        //preferences = PreferenceManager.getDefaultSharedPreferences(HistoryActivity.this);
+                                        //name = preferences.getString("Name", "");
 
-                                    listview.setOnTouchListener(new View.OnTouchListener() {
-                                        @Override
-                                        public boolean onTouch(View v, MotionEvent event) {
+                                        //Toast.makeText(HistoryActivity.this, ""+in_time+""+out_time+""+remarks, Toast.LENGTH_SHORT).show();
+                                        usersList.add(new Employee(name, in_time, out_time, remarks, date, location, status, totaltime));
+                                        //Toast.makeText(HistoryActivity.this, "name"+name, Toast.LENGTH_SHORT).show();
 
-                                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                            imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+                                        mAdapter = new MyAdapter(HistoryActivity.this, R.layout.activity_history, usersList);
+                                        listview.setAdapter(mAdapter);
+                                        progressDialog.dismiss();
 
-                                            return false;
-                                        }
-                                    });
-                                    //usersList.clear();
-                                    mAdapter.notifyDataSetChanged();
+                                        listview.setOnTouchListener(new View.OnTouchListener() {
+                                            @Override
+                                            public boolean onTouch(View v, MotionEvent event) {
 
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+                                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+
+                                                return false;
+                                            }
+                                        });
+                                        //usersList.clear();
+                                        mAdapter.notifyDataSetChanged();
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
+                            }
+
+                            else{
+                                progressDialog.dismiss();
+                                Toast.makeText(HistoryActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
                             }
 
                         } catch (JSONException e) {
@@ -593,6 +601,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                                 }
                             }
                             else{
+                                progressDialog.dismiss();
                                 Toast.makeText(HistoryActivity.this, "record on this date not found", Toast.LENGTH_SHORT).show();
                             }
 

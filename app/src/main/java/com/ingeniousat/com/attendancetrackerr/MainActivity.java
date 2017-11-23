@@ -3,6 +3,7 @@ package com.ingeniousat.com.attendancetrackerr;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,15 +34,30 @@ public class MainActivity extends AppCompatActivity {
     Button submitBtn;
     String url = "http://demo.ingtechbd.com/attendance/login.php";
     String employee_id,password;
-    TextView signupText;
+    TextView signupText,loginTitle;
     SharedPreferences pref;
     SharedPreferences.Editor edt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        try
+        {
+            this.getSupportActionBar().hide();
+        }
+        catch (NullPointerException e){}
+
         setContentView(R.layout.activity_main);
 
+        //String fontPath = "CircleD_Font_by_CrazyForMusic.ttf";
+
+
+        loginTitle = (TextView) findViewById(R.id.login_title);
+        //Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/" + fontPath);
+
+        // Applying font
+        //loginTitle.setTypeface(tf);
         empidEdt = (EditText) findViewById(R.id.employeeid);
         passwordEdt = (EditText) findViewById(R.id.password);
 

@@ -14,6 +14,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,6 +34,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -99,35 +102,39 @@ public class AttendanceActivity extends AppCompatActivity {
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
 
+        BottomNavigationView bottomNavigationView = (BottomNavigationView)
+                findViewById(R.id.navigation);
+
+
+
+        bottomNavigationView.setOnNavigationItemSelectedListener
+                (new BottomNavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.event_dashboard:
+                                Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
+                                startActivity(intent);
+                                return true;
+                            case R.id.report:
+                                Intent intent1 = new Intent(AttendanceActivity.this,ReportActivity.class);
+                                intent1.putExtra("empid",employee_id);
+                                startActivity(intent1);
+                        }
+                        return false;
+                    }
+                });
+
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
+        remarks = (EditText) findViewById(R.id.remarksEdt);
 
         outTime.setEnabled(false);
 
         submit = (Button)findViewById(R.id.login_button);
-        event = (Button) findViewById(R.id.eventSceduleView);
-        report = (Button)findViewById(R.id.reportView);
+
 
         final String currentdate = dateFormat.format(datetime);
-        getlastdate(new VolleyCallback(){
-            @Override
-            public void onSuccess(String result){
-                //Toast.makeText(AttendanceActivity.this, ""+dateget, Toast.LENGTH_SHORT).show();
-
-                Log.d("dateget",dateget);
-                Log.d("currentdate",currentdate);
-
-                if(!dateget.equals(currentdate)){
-                      inTime.setEnabled(true);
-                      outTime.setEnabled(false);
-                }
-                else{
-                }
-
-            }
-        });
-
-
 
         //Log.d("getthevalue",dateget);
         //Log.d("currentdate",currentdate);
@@ -158,7 +165,7 @@ public class AttendanceActivity extends AppCompatActivity {
         employee_id = intent.getExtras().getString("employeeid");
 
 
-
+        /*
         event.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -175,6 +182,7 @@ public class AttendanceActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        */
 
 
         //inTime.setEnabled(true);
@@ -197,10 +205,29 @@ public class AttendanceActivity extends AppCompatActivity {
             outTime.setEnabled(false);
         }
         //outTime.setChecked(false);
-        remarks = (EditText) findViewById(R.id.remarksEdt);
+
+
+        getlastdate(new VolleyCallback(){
+            @Override
+            public void onSuccess(String result){
+                //Toast.makeText(AttendanceActivity.this, ""+dateget, Toast.LENGTH_SHORT).show();
+
+                Log.d("dateget",dateget);
+                Log.d("currentdate",currentdate);
+
+                if(!dateget.equals(currentdate)){
+                    //inTime.setEnabled(true);
+                    //outTime.setEnabled(false);
+                    //remarks.setEnabled(true);
+                }
+                else{
+                }
+
+            }
+        });
+
 
     }
-
 
 
     private void getlastdate(final VolleyCallback callback) {
@@ -348,6 +375,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
     public void OnSubmit(View view) {
 
+
         if (inTime.isChecked()) {
 
             SimpleDateFormat simpleDateFormats = new SimpleDateFormat("HH:mm");
@@ -466,7 +494,7 @@ public class AttendanceActivity extends AppCompatActivity {
                 diffMinutes = Math.abs(diff/(60 * 1000) % 60);
                 hours = String.valueOf(diffHours);
                 minutes = String.valueOf(diffMinutes);
-                hourmintues = ""+diffHours+"Hour"+":"+""+diffMinutes+""+"Minute";
+                hourmintues = diffHours+"h"+diffMinutes+"m";
                 Log.d("totaltimeofhourandime",hourmintues);
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -512,6 +540,7 @@ public class AttendanceActivity extends AppCompatActivity {
             queues.add(stringRequests);
 
         }
+
     }
 
 

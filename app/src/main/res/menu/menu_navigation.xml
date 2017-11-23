@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/attendance_dashboard"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="Attendance" />
+
+    <item
+        android:id="@+id/event_dashboard"
+        android:icon="@drawable/ic_content_paste_black_24dp"
+        android:title="Event" />
+
+    <item
+        android:id="@+id/report"
+        android:icon="@drawable/ic_chrome_reader_mode_black_24dp"
+        android:title="Report" />
+
+</menu>
