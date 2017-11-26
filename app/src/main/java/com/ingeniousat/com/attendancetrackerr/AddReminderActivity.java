@@ -20,6 +20,7 @@ public class AddReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_reminder);
 
+        AddReminderActivity.this.setTitle("iAttendance");
         final LayoutInflater layoutInflater = this.getLayoutInflater();
 
         final EditText nameEditText = (EditText) findViewById(R.id.editName);

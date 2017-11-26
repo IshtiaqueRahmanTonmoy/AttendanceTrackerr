@@ -102,6 +102,7 @@ public class AttendanceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
 
+        AttendanceActivity.this.setTitle("iAttendance");
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
 

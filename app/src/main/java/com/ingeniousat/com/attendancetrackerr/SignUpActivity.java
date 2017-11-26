@@ -54,6 +54,7 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        SignUpActivity.this.setTitle("iAttendance");
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -164,7 +165,7 @@ public class SignUpActivity extends AppCompatActivity {
                         params.put("address",address);
                         params.put("designation", designation);
                         params.put("gender", gender);
-                        params.put("password", password);
+                        params.put("password", passwords);
 
                         Log.d("params", String.valueOf(params));
                         return params;

@@ -27,6 +27,7 @@ public class EditReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_reminder);
 
+        EditReminderActivity.this.setTitle("iAttendance");
         Bundle extras = getIntent().getExtras();
 
         String name = extras.getString("name");

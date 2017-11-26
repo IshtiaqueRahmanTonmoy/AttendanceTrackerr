@@ -19,6 +19,7 @@ public class AddReminderFirstActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_reminder_first);
 
+        AddReminderFirstActivity.this.setTitle("iAttendance");
         final DatePicker datePicker = (DatePicker) findViewById(R.id.datePicker);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

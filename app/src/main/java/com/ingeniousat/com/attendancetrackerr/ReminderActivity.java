@@ -18,6 +18,7 @@ public class ReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder);
 
+        ReminderActivity.this.setTitle("iAttendance");
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
         //toolbar.setTitle("Reminder Calendar");

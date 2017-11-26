@@ -51,6 +51,7 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
+        ReportActivity.this.setTitle("iAttendance");
         usersList = new ArrayList<Employee>();
         pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         empid = pref.getString("empid",null);

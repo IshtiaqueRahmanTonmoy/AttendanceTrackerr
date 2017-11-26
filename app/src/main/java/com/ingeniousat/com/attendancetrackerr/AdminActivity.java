@@ -14,6 +14,7 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        AdminActivity.this.setTitle("iAttendance");
         employeehistory = (Button) findViewById(R.id.historyBtn);
         addemployee = (Button) findViewById(R.id.addBtns);
 

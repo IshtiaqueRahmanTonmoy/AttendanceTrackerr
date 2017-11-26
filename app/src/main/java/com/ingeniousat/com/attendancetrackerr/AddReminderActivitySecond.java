@@ -18,6 +18,7 @@ public class AddReminderActivitySecond extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_reminder_activity_second);
 
+        AddReminderActivitySecond.this.setTitle("iAttendance");
         Bundle extras = getIntent().getExtras();
         final int year = extras.getInt("year");
         final int month = extras.getInt("month");

@@ -25,6 +25,7 @@ public class ViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
 
+        ViewActivity.this.setTitle("iAttendance");
         ListView reminderListView = (ListView) findViewById(R.id.reminderListView);
 
         DBHandler dbHandler = new DBHandler(this,null,null,1);

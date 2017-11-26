@@ -27,6 +27,7 @@ public class ViewingDatesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewing_dates);
 
+        ViewingDatesActivity.this.setTitle("iAttendance");
         Bundle extras = getIntent().getExtras();
         String date = extras.getString("date");
 

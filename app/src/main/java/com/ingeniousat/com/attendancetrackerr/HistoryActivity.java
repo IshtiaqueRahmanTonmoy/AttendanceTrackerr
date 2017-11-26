@@ -79,6 +79,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
         setContentView(R.layout.activity_history);
         //HistoryActivity.this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+        HistoryActivity.this.setTitle("iAttendance");
         usersList = new ArrayList<>();
 
         nametext = (TextView) findViewById(R.id.textview);

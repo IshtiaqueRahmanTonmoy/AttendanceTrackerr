@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AttendanceTracker</string>
+    <string name="app_name">iAttendance</string>
 
     <string name="in">In</string>
     <string name="out">Out</string>
@@ -7,7 +7,7 @@
     <string name="date">Date</string>
     <string name="status">Status</string>
     <string name="workinghour">9</string>
-    <string name="whour">Working hour</string>
+    <string name="whour">Hour</string>
     <string name="submit">Submit</string>
     <string name="gender">Gender</string>
     <string name="name">Name</string>
