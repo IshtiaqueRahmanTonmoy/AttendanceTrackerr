@@ -1,6 +1,7 @@
 package com.ingeniousat.com.attendancetrackerr;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
@@ -118,6 +119,14 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
             }
         });
        // searchybydate.setEnabled(false);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(ReportActivity.this,AttendanceActivity.class);
+        intent.putExtra("stringforreport","2");
+        startActivity(intent);
     }
 
     private void getname(final String value) {

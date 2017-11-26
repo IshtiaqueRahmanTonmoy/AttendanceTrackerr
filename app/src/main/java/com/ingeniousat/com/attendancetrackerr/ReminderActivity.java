@@ -65,6 +65,14 @@ public class ReminderActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(ReminderActivity.this,AttendanceActivity.class);
+        intent.putExtra("stringforreminder","1");
+        startActivity(intent);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_reminder, menu);
@@ -86,3 +94,4 @@ public class ReminderActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+

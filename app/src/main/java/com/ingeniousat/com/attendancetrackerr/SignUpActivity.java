@@ -189,7 +189,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 //Getting json object
                                 JSONObject json = j.getJSONObject(i);
                                 employee_id = json.getInt("employee_id");
-                                Toast.makeText(SignUpActivity.this, "employeeid"+employee_id, Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(SignUpActivity.this, "employeeid"+employee_id, Toast.LENGTH_SHORT).show();
 
                             } catch (JSONException e) {
                                 e.printStackTrace();

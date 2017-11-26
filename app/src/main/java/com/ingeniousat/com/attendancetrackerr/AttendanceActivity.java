@@ -1,5 +1,6 @@
 package com.ingeniousat.com.attendancetrackerr;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,6 +37,7 @@ import java.util.Calendar;
 
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -93,7 +95,8 @@ public class AttendanceActivity extends AppCompatActivity {
     String location,dateget;
     private StringRequest stringRequest;
     SharedPreferences sharedpreferences;
-
+    String values;
+    BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,9 +105,10 @@ public class AttendanceActivity extends AppCompatActivity {
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
 
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)
+        bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.navigation);
 
+        bottomNavigationView.getMenu().findItem(R.id.attendance_dashboard).setChecked(true);
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener
@@ -112,14 +116,20 @@ public class AttendanceActivity extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.event_dashboard:
-                                Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
-                                startActivity(intent);
+                            case R.id.attendance_dashboard:
+                                //Intent intent = new Intent(AttendanceActivity.this,AttendanceActivity.class);
+                                //startActivity(intent);
                                 return true;
-                            case R.id.report:
-                                Intent intent1 = new Intent(AttendanceActivity.this,ReportActivity.class);
-                                intent1.putExtra("empid",employee_id);
+
+                            case R.id.event_dashboard:
+                                Intent intent1 = new Intent(AttendanceActivity.this,ReminderActivity.class);
                                 startActivity(intent1);
+                                return true;
+
+                            case R.id.report:
+                                Intent intent2 = new Intent(AttendanceActivity.this,ReportActivity.class);
+                                intent2.putExtra("empid",employee_id);
+                                startActivity(intent2);
                         }
                         return false;
                     }
@@ -128,6 +138,16 @@ public class AttendanceActivity extends AppCompatActivity {
         inTime = (CheckBox) findViewById(R.id.checkBox1);
         outTime = (CheckBox) findViewById(R.id.checkBox2);
         remarks = (EditText) findViewById(R.id.remarksEdt);
+
+        remarks.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
+
 
         outTime.setEnabled(false);
 
@@ -228,6 +248,11 @@ public class AttendanceActivity extends AppCompatActivity {
 
 
     }
+
+     public void hideKeyboard(View view) {
+            InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
 
 
     private void getlastdate(final VolleyCallback callback) {
