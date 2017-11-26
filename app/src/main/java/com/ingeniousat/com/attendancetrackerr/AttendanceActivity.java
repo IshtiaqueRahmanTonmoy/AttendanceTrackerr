@@ -124,12 +124,14 @@ public class AttendanceActivity extends AppCompatActivity {
                             case R.id.event_dashboard:
                                 Intent intent1 = new Intent(AttendanceActivity.this,ReminderActivity.class);
                                 startActivity(intent1);
+                                finish();
                                 return true;
 
                             case R.id.report:
                                 Intent intent2 = new Intent(AttendanceActivity.this,ReportActivity.class);
                                 intent2.putExtra("empid",employee_id);
                                 startActivity(intent2);
+                                finish();
                         }
                         return false;
                     }
