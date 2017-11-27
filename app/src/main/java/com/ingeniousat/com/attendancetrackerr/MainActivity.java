@@ -1,5 +1,7 @@
 package com.ingeniousat.com.attendancetrackerr;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -37,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     TextView signupText,loginTitle;
     SharedPreferences pref;
     SharedPreferences.Editor edt;
-
+    private ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +63,24 @@ public class MainActivity extends AppCompatActivity {
         //loginTitle.setTypeface(tf);
         empidEdt = (EditText) findViewById(R.id.employeeid);
         passwordEdt = (EditText) findViewById(R.id.password);
+
+        empidEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
+
+        passwordEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }
+            }
+        });
 
         pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         int getid = pref.getInt("id",0);
@@ -100,12 +121,15 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("response",response);
                                 if(response.equals("Connected successfully<br>{\"success\":0,\"message\":\"Oops! An error occurred.\"}")){
                                     Toast.makeText(MainActivity.this, "Please enter correct information..", Toast.LENGTH_SHORT).show();
+                                    progressDialog.dismiss();
                                 }
                                 else {
 
                                     if(employee_id.equals("1001")){
                                         Intent intent = new Intent(MainActivity.this,AdminActivity.class);
                                         startActivity(intent);
+                                        finish();
+                                        progressDialog.dismiss();
                                     }
 
                                     else{
@@ -119,6 +143,8 @@ public class MainActivity extends AppCompatActivity {
                                         edt.commit();
 
                                         startActivity(intent);
+                                        finish();
+                                        progressDialog.dismiss();
                                     }
 
 
@@ -146,10 +172,18 @@ public class MainActivity extends AppCompatActivity {
                 };
                 // Add the request to the RequestQueue.
                 queue.add(stringRequest);
+                progressDialog = new ProgressDialog(MainActivity.this);
+                progressDialog.setMessage("Please wait....");
+                progressDialog.show();
 
             }
         });
     }
 
 
+        public void hideKeyboard(View view) {
+            InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+    }
 }

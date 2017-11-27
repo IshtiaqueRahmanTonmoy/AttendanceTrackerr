@@ -36,7 +36,7 @@ public class AddReminderFirstActivity extends AppCompatActivity {
                 nextStep.putExtra("month", month);
                 nextStep.putExtra("year", year);
                 startActivity(nextStep);
-                finish();
+
             }
         });
     }

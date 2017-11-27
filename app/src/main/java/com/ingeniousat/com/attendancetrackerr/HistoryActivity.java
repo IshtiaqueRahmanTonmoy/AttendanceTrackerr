@@ -93,6 +93,16 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
         searchview = (EditText) findViewById(R.id.searhText);
         searchview.setFocusable(false);
+
+        searchview.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
+                }
+            }
+        });
         searchview.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -121,7 +131,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
                         usersList.clear();
                         mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
                         listview.setAdapter(mAdapter);
-                        searchview.setFocusableInTouchMode(true);
+                        searchview.setFocusableInTouchMode(false);
                         searchview.requestFocus();
                         DateRangePickerFragment dateRangePickerFragment= DateRangePickerFragment.newInstance(HistoryActivity.this,false);
                         dateRangePickerFragment.show(getSupportFragmentManager(),"datePicker");
@@ -396,7 +406,7 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
         requestQueue.add(stringRequest);
     }
 
-    private void getsearch(String value, final String name) {
+    private void getsearch(final String value, final String name) {
         Uri.Builder builder = Uri.parse(GETINFO_URL).buildUpon();
         builder.appendQueryParameter("employee_id", value);
         String loginUrl=builder.build().toString();
@@ -434,8 +444,28 @@ public class HistoryActivity extends AppCompatActivity  implements DateRangePick
 
                                         mAdapter = new MyAdapter(HistoryActivity.this, R.layout.activity_history, usersList);
                                         listview.setAdapter(mAdapter);
+                                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                        imm.hideSoftInputFromWindow(searchview.getWindowToken(), 0);
                                         progressDialog.dismiss();
 
+                                        searchview.addTextChangedListener(new TextWatcher() {
+                                            @Override
+                                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                            }
+
+                                            @Override
+                                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                                            }
+
+                                            @Override
+                                            public void afterTextChanged(Editable editable) {
+                                                usersList.clear();
+                                                nametext.setText("");
+                                                mAdapter = new MyAdapter(HistoryActivity.this,R.layout.activity_history,usersList);
+                                                listview.setAdapter(mAdapter);
+                                            }
+                                        });
                                         listview.setOnTouchListener(new View.OnTouchListener() {
                                             @Override
                                             public boolean onTouch(View v, MotionEvent event) {

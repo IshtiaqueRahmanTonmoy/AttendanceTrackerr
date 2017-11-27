@@ -63,17 +63,6 @@
         android:text="@string/location" />
 
     <TextView
-        android:id="@+id/remarks"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1.7"
-        android:background="@drawable/cell_shape"
-        android:ellipsize="end"
-        android:padding="5dp"
-        android:singleLine="true"
-        android:text="@string/remarks" />
-
-    <TextView
         android:id="@+id/status"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -84,5 +73,18 @@
         android:singleLine="true"
         android:text="@string/status" >
     </TextView>
+
+    <TextView
+        android:id="@+id/remarks"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.7"
+        android:background="@drawable/cell_shape"
+        android:ellipsize="end"
+        android:padding="5dp"
+        android:singleLine="true"
+        android:text="@string/remarks" />
+
+
 
 </LinearLayout>
