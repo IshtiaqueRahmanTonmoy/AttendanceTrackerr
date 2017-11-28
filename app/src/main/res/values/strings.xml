@@ -22,6 +22,7 @@
     <string name="location">Location</string>
     <string name="but_done">Done</string>
     <string name="address">Address</string>
+    <string name="update">Update</string>
 
     <string name="reportview">View Report</string>
     <string name="action_settings">Settings</string>
@@ -29,6 +30,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_tab_start_date">Start Date</string>
     <string name="ttile_tab_end_date">End Date</string>
+    <string name="confirmpassword">Confirm Password</string>
 
 
     <style name="DefaultButtonText">

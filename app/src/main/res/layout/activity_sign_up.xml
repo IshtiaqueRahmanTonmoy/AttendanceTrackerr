@@ -8,6 +8,31 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginRight="10dp"
+            android:text="ID NO-"
+            />
+
+        <TextView
+            android:id="@+id/idvalue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:text="ID"
+            />
+
+    </LinearLayout>
+
     <EditText
         android:id="@+id/name"
         android:layout_width="fill_parent"
@@ -21,7 +46,7 @@
         android:layout_marginTop="15dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:paddingBottom="10dp"
+        android:paddingBottom="7dp"
         android:paddingLeft="15dp"
         android:paddingRight="15dip"
         android:paddingTop="15dp"
@@ -39,7 +64,7 @@
         android:hint="@string/email"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="45dip"
@@ -58,7 +83,7 @@
         android:hint="@string/address"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="45dip"
@@ -77,7 +102,7 @@
         android:hint="@string/designation"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="45dip"
@@ -96,7 +121,7 @@
         android:hint="@string/gender"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="45dip"
@@ -116,12 +141,32 @@
         android:hint="@string/password"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="5dp"
         android:paddingBottom="10dp"
         android:paddingLeft="15dp"
         android:paddingRight="45dip"
         android:paddingTop="15dp"
         android:textSize="18sp"/>
+
+    <EditText
+        android:id="@+id/confirmpassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="@drawable/edit_text_design"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:maxLength="50"
+        android:hint="@string/confirmpassword"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="45dip"
+        android:paddingTop="15dp"
+        android:textSize="18sp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -136,10 +181,23 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="4dp"
             android:layout_weight="1"
-            android:background="@color/ColorPrimary"
+            android:background="@drawable/button_shape"
             android:tag="facebook_login_button"
             android:textColor="@color/textColorPrimary"
             android:text="@string/signin" />
+
+        <Button
+            android:id="@+id/update"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_shape"
+            android:tag="facebook_login_button"
+            android:textColor="@color/textColorPrimary"
+            android:text="@string/update" />
 
         <LinearLayout
             android:layout_width="fill_parent"
