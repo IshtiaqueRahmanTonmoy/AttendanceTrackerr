@@ -94,4 +94,3 @@ public class ReminderActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
-

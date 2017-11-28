@@ -21,20 +21,23 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="All Reminders"
-        android:id="@+id/allRemindersButton"
+        android:text="Back"
+        android:id="@+id/backToMainActivity"
         android:textColor="@color/white"
-        android:background="@color/blue"
-        android:layout_alignParentBottom="true"
+        android:background="@drawable/button_shapeevent"
+        android:layout_alignTop="@+id/allRemindersButton"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to main"
-        android:id="@+id/backToMainActivity"
+        android:text="Reminders"
+        android:id="@+id/allRemindersButton"
         android:textColor="@color/white"
-        android:background="@color/blue"
-        android:layout_alignTop="@+id/allRemindersButton"
+        android:background="@drawable/button_shapeevent"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
+
+
 </RelativeLayout>

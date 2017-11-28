@@ -101,5 +101,5 @@
         android:paddingLeft="15dp"
         android:background="@drawable/user_profile_image_background"
         android:elevation="8dp"
-        android:src="@drawable/img" />
+        android:src="@drawable/attendance" />
 </RelativeLayout>

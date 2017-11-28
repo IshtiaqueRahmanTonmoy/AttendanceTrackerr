@@ -198,7 +198,6 @@ public class AttendanceActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -277,10 +276,10 @@ public class AttendanceActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-     public void hideKeyboard(View view) {
-            InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
 
     private void getlastdate(final VolleyCallback callback) {
@@ -450,10 +449,10 @@ public class AttendanceActivity extends AppCompatActivity {
 
             long difference = endDate.getTime() - startDate.getTime();
             int days = (int) (difference / (1000*60*60*24));
-            int hours = (int) ((difference - (1000*60*60*24*days)) / (1000*60*60));
-            int min = (int) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60);
-            hourminute = ""+hours+":"+min;
-            Log.i("log_tag","Hours: "+hours+", Mins: "+min);
+            int hours = Math.abs((int) ((difference - (1000*60*60*24*days)) / (1000*60*60)));
+            int min = Math.abs((int) (difference - (1000*60*60*24*days) - (1000*60*60*hours)) / (1000*60));
+            status = ""+hours+":"+min;
+            Log.i("log_tag",status);
 
 
             String t = remarksEdt = remarks.getText().toString();
@@ -479,7 +478,7 @@ public class AttendanceActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(String response) {
                             Log.d("response", response);
-                            Toast.makeText(AttendanceActivity.this, ""+response, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(AttendanceActivity.this, ""+response, Toast.LENGTH_SHORT).show();
                             Toast.makeText(AttendanceActivity.this, "in time registered", Toast.LENGTH_SHORT).show();
                             inTime.setChecked(false);
                             inTime.setEnabled(false);
@@ -503,7 +502,7 @@ public class AttendanceActivity extends AppCompatActivity {
                     params.put("out_time", "");
                     params.put("date", date);
                     params.put("location",location);
-                    params.put("status",hourminute);
+                    params.put("status",status);
                     params.put("remarks", remarksEdt);
 
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AttendanceActivity.this);
@@ -585,7 +584,7 @@ public class AttendanceActivity extends AppCompatActivity {
                     params.put("totaltime", hourmintues);
                     params.put("employee_id", employee_id);
                     params.put("date", date);
-                    Log.d("params",params.toString());
+                    Log.d("paramsss",params.toString());
                     return params;
                 }
             };
