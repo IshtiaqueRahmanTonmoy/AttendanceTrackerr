@@ -11,6 +11,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
@@ -38,6 +39,7 @@ import java.util.Calendar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -81,6 +83,7 @@ public class AttendanceActivity extends AppCompatActivity {
     boolean value;
     String employeeid;
     String urlvalue = "http://demo.ingtechbd.com/attendance/getvalue.php";
+    String GETVALUE = "http://ingtechbd.com/demo/attendance/getlastintime.php";
     long diff, diffMinutes, diffHours;
     SharedPreferences pref,prefs;
     SharedPreferences.Editor edt;
@@ -97,16 +100,33 @@ public class AttendanceActivity extends AppCompatActivity {
     String location,dateget;
     private StringRequest stringRequest;
     SharedPreferences sharedpreferences;
-    String values;
+    String values,intime,outime;
     BottomNavigationView bottomNavigationView;
+    boolean backfromintent = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_attendance);
 
-        AttendanceActivity.this.setTitle("iAttendance");
         dateFormat = new SimpleDateFormat("d/M/yyyy");
         datetime = new Date();
+        final String currentdate = dateFormat.format(datetime);
+
+        Intent intent = getIntent();
+        employee_id = intent.getExtras().getString("employeeid");
+        backfromintent = getIntent().getExtras().getBoolean("booleanvalue");
+        if(backfromintent){
+            check(employee_id,currentdate);
+        }
+
+        //Toast.makeText(AttendanceActivity.this, ""+backfromintent, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(AttendanceActivity.this, ""+backfromintent.length(), Toast.LENGTH_SHORT).show();
+        AttendanceActivity.this.setTitle("iAttendance");
+
+
+        check(employee_id,currentdate);
+
 
         bottomNavigationView = (BottomNavigationView)
                 findViewById(R.id.navigation);
@@ -126,6 +146,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
                             case R.id.event_dashboard:
                                 Intent intent1 = new Intent(AttendanceActivity.this,ReminderActivity.class);
+                                intent1.putExtra("empid",employee_id);
                                 startActivity(intent1);
                                 finish();
                                 return true;
@@ -154,12 +175,12 @@ public class AttendanceActivity extends AppCompatActivity {
         });
 
 
-        outTime.setEnabled(false);
+        //outTime.setEnabled(false);
 
         submit = (Button)findViewById(R.id.login_button);
 
 
-        final String currentdate = dateFormat.format(datetime);
+
 
         //Log.d("getthevalue",dateget);
         //Log.d("currentdate",currentdate);
@@ -186,27 +207,7 @@ public class AttendanceActivity extends AppCompatActivity {
         }
 
 
-        Intent intent = getIntent();
-        employee_id = intent.getExtras().getString("employeeid");
 
-
-        /*
-        event.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(AttendanceActivity.this,ReminderActivity.class);
-                startActivity(intent);
-            }
-        });
-        report.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(AttendanceActivity.this,ReportActivity.class);
-                intent.putExtra("empid",employee_id);
-                startActivity(intent);
-            }
-        });
-        */
 
 
         //inTime.setEnabled(true);
@@ -214,6 +215,8 @@ public class AttendanceActivity extends AppCompatActivity {
 
         //Toast.makeText(AttendanceActivity.this, ""+easyPuzzle, Toast.LENGTH_SHORT).show();
 
+
+        /*
         pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
         int getid = pref.getInt("activity_executed",0);
         if(getid == 2){
@@ -228,6 +231,7 @@ public class AttendanceActivity extends AppCompatActivity {
             inTime.setEnabled(false);
             outTime.setEnabled(false);
         }
+        */
         //outTime.setChecked(false);
 
 
@@ -251,6 +255,87 @@ public class AttendanceActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void check(String employee_id, String currentdate) {
+        //Toast.makeText(HistoryActivity.this, ""+datevalue, Toast.LENGTH_SHORT).show();
+        Uri.Builder builder = Uri.parse(GETVALUE).buildUpon();
+        builder.appendQueryParameter("employee_id",employee_id);
+        builder.appendQueryParameter("date",currentdate);
+        String loginUrl=builder.build().toString();
+        Log.d("loginurl",loginUrl);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, loginUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            Log.d("response", response.toString());
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray j = jsonObject.getJSONArray("result");
+                            //Toast.makeText(HistoryActivity.this, "length"+j.length(), Toast.LENGTH_SHORT).show();
+                            for (int i = 0; i < j.length(); i++) {
+                                    try {
+                                        //Getting json object
+                                        JSONObject json = j.getJSONObject(i);
+                                        Log.d("json", json.toString());
+
+                                        intime = json.getString("in_time");
+                                        outime = json.getString("out_time");
+
+                                        //Toast.makeText(AttendanceActivity.this, "outitme"+outime,Toast.LENGTH_SHORT).show();
+                                        //int outlength = outitme.length();
+                                        Log.d("outtime", outime);
+
+                                       if(!intime.equals("null") && outime.equals("")){
+                                            //Toast.makeText(AttendanceActivity.this, "this is intime not null and outime null", Toast.LENGTH_SHORT).show();
+                                            inTime.setEnabled(false);
+                                            outTime.setEnabled(true);
+                                        }
+
+
+                                        else if(!intime.equals("null") && !outime.equals("null")){
+                                            //Toast.makeText(AttendanceActivity.this, "this is intime null and outime not null", Toast.LENGTH_SHORT).show();
+                                            inTime.setEnabled(false);
+                                            outTime.setEnabled(false);
+                                        }
+
+
+                                       /*
+                                        else{
+                                           inTime.setEnabled(false);
+                                           outTime.setEnabled(false);
+                                        }
+                                        */
+                                        /*
+                                        if(!intime.equals("")){
+                                            inTime.setChecked(false);
+                                            outTime.setChecked(true);
+                                        }
+                                        */
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                              }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d("response",response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("error", String.valueOf(error));
+                        //You can handle error here if you want
+                    }
+                }){
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(AttendanceActivity.this);
+        requestQueue.add(stringRequest);
     }
 
 
@@ -526,8 +611,8 @@ public class AttendanceActivity extends AppCompatActivity {
             editor.apply();
 
             date = dateFormat.format(datetime);
-            pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
-            String intime = pref.getString("intime",null);
+            //pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
+            //String intime = pref.getString("intime",null);
             //Toast.makeText(AttendanceActivity.this, ""+intime, Toast.LENGTH_SHORT).show();
 
             cal1 = Calendar.getInstance();

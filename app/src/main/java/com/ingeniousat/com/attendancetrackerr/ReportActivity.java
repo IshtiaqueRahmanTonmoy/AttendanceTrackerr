@@ -51,6 +51,9 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
+        Intent intent = getIntent();
+        employee_id = intent.getExtras().getString("empid");
+
         ReportActivity.this.setTitle("iAttendance");
         usersList = new ArrayList<Employee>();
         pref = getSharedPreferences("ActivityPREF", Context.MODE_PRIVATE);
@@ -126,7 +129,8 @@ public class ReportActivity extends AppCompatActivity implements DateRangePicker
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(ReportActivity.this,AttendanceActivity.class);
-        intent.putExtra("stringforreport","2");
+        intent.putExtra("booleanvalue",true);
+        intent.putExtra("employeeid",employee_id);
         startActivity(intent);
     }
 

@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     if(employee_id.equals("1001")){
                                         Intent intent = new Intent(MainActivity.this,AdminActivity.class);
+                                        intent.putExtra("employeeid",employee_id);
                                         startActivity(intent);
                                         finish();
                                         progressDialog.dismiss();

@@ -1,6 +1,7 @@
 package com.ingeniousat.com.attendancetrackerr;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -13,10 +14,18 @@ import android.widget.CalendarView;
 
 public class ReminderActivity extends AppCompatActivity {
 
+
+    public static final String MY_PREFS_NAME = "MyPrefsFile";
+    SharedPreferences.Editor editor;
+    String employee_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder);
+
+        Intent intent = getIntent();
+        employee_id = intent.getExtras().getString("empid");
 
         ReminderActivity.this.setTitle("iAttendance");
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -37,7 +46,6 @@ public class ReminderActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent toAllReminders = new Intent(getApplicationContext(),AttendanceActivity.class);
-                toAllReminders.putExtra("employeeid",0);
                 startActivity(toAllReminders);
             }
         });
@@ -68,7 +76,8 @@ public class ReminderActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(ReminderActivity.this,AttendanceActivity.class);
-        intent.putExtra("stringforreminder","1");
+        intent.putExtra("booleanvalue",true);
+        intent.putExtra("employeeid",employee_id);
         startActivity(intent);
     }
 

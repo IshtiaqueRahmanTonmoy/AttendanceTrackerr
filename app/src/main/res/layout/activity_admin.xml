@@ -18,7 +18,7 @@
 
                 <Button android:id="@+id/addBtns" android:layout_margin="5dp" android:layout_weight="1"
                     android:layout_height="wrap_content" android:layout_width="fill_parent"
-                    android:text="Add employee" android:textColor="@color/white" android:textStyle="bold"
+                    android:text="Add/Update employee" android:textColor="@color/white" android:textStyle="bold"
                     android:background="@drawable/button_shape"/>
         </LinearLayout>
 </RelativeLayout>

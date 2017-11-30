@@ -67,11 +67,15 @@ public class SignUpActivity extends AppCompatActivity {
     private StringRequest stringRequest;
     Context context;
     private ProgressDialog progressDialog;
+    String employeeid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
+        Intent intent = getIntent();
+        employeeid = intent.getExtras().getString("employeeid");
 
         context = this;
         SignUpActivity.this.setTitle("iAttendance");
@@ -92,6 +96,8 @@ public class SignUpActivity extends AppCompatActivity {
         });
 
         idoutputvalue = (TextView) findViewById(R.id.idvalue);
+        idoutputvalue.setText(employeeid);
+
         idvalue = (TextView) findViewById(R.id.id);
 
         passwordEdt = (EditText) findViewById(R.id.password);
@@ -218,7 +224,7 @@ public class SignUpActivity extends AppCompatActivity {
                 confirmpassword = confirmpasswordEdt.getText().toString();
 
                 if(!password.equals(confirmpassword)){
-                    Toast.makeText(SignUpActivity.this, "password do not match", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpActivity.this, "password and confirm password do not match..", Toast.LENGTH_SHORT).show();
                 }
                 else{
                   update(name,email,address,designation,gender,password,confirmpassword);
@@ -241,7 +247,9 @@ public class SignUpActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        //Toast.makeText(SignUpActivity.this, ""+response, Toast.LENGTH_SHORT).show();
                         Toast.makeText(SignUpActivity.this, "updated informations", Toast.LENGTH_SHORT).show();
+
                         final String from="ingeniousit18@gmail.com";//change accordingly
                         String password="121212";//change accordingly
 
@@ -272,6 +280,7 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                         catch (MessagingException e) {throw new RuntimeException(e);}
 
+
                         progressDialog.dismiss();
                     }
                 }, new Response.ErrorListener() {
@@ -285,7 +294,7 @@ public class SignUpActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
                 //Log.d("allresultvalue",sdf1.format(cal1.getTime())+hourmintues+employee_id+date);
-                params.put("employee_id", String.valueOf(employee_id));
+                params.put("employee_id", idoutputvalue.getText().toString());
                 params.put("name",name);
                 params.put("email", email);
                 params.put("address", address);
@@ -315,6 +324,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        submitBtn.setEnabled(false);
         int id = item.getItemId();
         if (id == R.id.action_update) {
             LayoutInflater li = LayoutInflater.from(context);

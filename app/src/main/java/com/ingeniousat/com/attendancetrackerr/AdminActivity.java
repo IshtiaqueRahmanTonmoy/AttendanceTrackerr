@@ -13,11 +13,15 @@ import android.widget.Button;
 
 public class AdminActivity extends AppCompatActivity {
 
+    String employee_id;
     Button employeehistory,addemployee;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
+
+        Intent intent = getIntent();
+        employee_id = intent.getExtras().getString("employeeid");
 
         AdminActivity.this.setTitle("iAttendance");
         employeehistory = (Button) findViewById(R.id.historyBtn);
@@ -27,6 +31,7 @@ public class AdminActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(AdminActivity.this,SignUpActivity.class);
+                intent.putExtra("employeeid",employee_id);
                 startActivity(intent);
 
             }
