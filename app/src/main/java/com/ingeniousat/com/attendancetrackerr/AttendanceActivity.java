@@ -2,6 +2,7 @@ package com.ingeniousat.com.attendancetrackerr;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -103,6 +104,7 @@ public class AttendanceActivity extends AppCompatActivity {
     String values,intime,outime;
     BottomNavigationView bottomNavigationView;
     boolean backfromintent = false;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -283,8 +285,6 @@ public class AttendanceActivity extends AppCompatActivity {
                                         intime = json.getString("in_time");
                                         outime = json.getString("out_time");
 
-                                        //Toast.makeText(AttendanceActivity.this, "outitme"+outime,Toast.LENGTH_SHORT).show();
-                                        //int outlength = outitme.length();
                                         Log.d("outtime", outime);
 
                                        if(!intime.equals("null") && outime.equals("")){
@@ -300,20 +300,6 @@ public class AttendanceActivity extends AppCompatActivity {
                                             outTime.setEnabled(false);
                                         }
 
-
-                                       /*
-                                        else{
-                                           inTime.setEnabled(false);
-                                           outTime.setEnabled(false);
-                                        }
-                                        */
-                                        /*
-                                        if(!intime.equals("")){
-                                            inTime.setChecked(false);
-                                            outTime.setChecked(true);
-                                        }
-                                        */
-
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }
@@ -323,6 +309,7 @@ public class AttendanceActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                         Log.d("response",response);
+
                     }
                 },
                 new Response.ErrorListener() {
@@ -619,7 +606,8 @@ public class AttendanceActivity extends AppCompatActivity {
             sdf1 = new SimpleDateFormat("hh:mm a");
 
             try {
-                Date d1 = sdf.parse(intime);
+                //Toast.makeText(AttendanceActivity.this, ""+intime, Toast.LENGTH_SHORT).show();
+                Date d1 = sdf.parse(sdf.format(cal.getTime()));
                 //Toast.makeText(AttendanceActivity.this, "date d1"+d1, Toast.LENGTH_SHORT).show();
                 Date d2 = sdf.parse(sdf1.format(cal1.getTime()));
                 Log.d("intime", String.valueOf(d1));
